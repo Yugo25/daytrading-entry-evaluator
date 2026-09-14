@@ -11,6 +11,7 @@ import { renderEvaluation } from "./render";
 
 const client = new Anthropic();
 const MODEL = process.env.EVAL_MODEL ?? "claude-opus-5";
+const EFFORT = (process.env.EVAL_EFFORT ?? "high") as "low" | "medium" | "high" | "xhigh" | "max";
 const FEW_SHOT_LIMIT = 8;
 
 type ImageMedia = "image/png" | "image/jpeg" | "image/webp" | "image/gif";
@@ -65,14 +66,20 @@ export async function evaluateSetup(setupId: string) {
   userLines.push("", "上記のセットアップを手法基準に照らして評価し、JSONスキーマに従って出力してください。");
   content.push({ type: "text", text: userLines.join("\n") });
 
-  const response = await client.messages.parse({
-    model: MODEL,
-    max_tokens: 16000,
-    thinking: { type: "adaptive" },
-    output_config: { effort: "high", format: zodOutputFormat(EvaluationOutputSchema) },
-    system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
-    messages: [{ role: "user", content }],
-  });
+  // 長い思考を伴うためストリーミングで受ける(非ストリーミングだとHTTPタイムアウト→再試行で数分〜十数分かかる)
+  const response = await client.messages
+    .stream(
+      {
+        model: MODEL,
+        max_tokens: 32000,
+        thinking: { type: "adaptive" },
+        output_config: { effort: EFFORT, format: zodOutputFormat(EvaluationOutputSchema) },
+        system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
+        messages: [{ role: "user", content }],
+      },
+      { maxRetries: 0 },
+    )
+    .finalMessage();
 
   if (response.stop_reason === "refusal") {
     throw new Error(`モデルが応答を拒否しました: ${response.stop_details?.explanation ?? ""}`);

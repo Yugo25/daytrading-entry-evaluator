@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 
 const nav = [
   { href: "/evaluate", label: "判定" },
+  { href: "/setups", label: "判定一覧" },
   { href: "/journal", label: "ジャーナル" },
   { href: "/stats", label: "統計" },
   { href: "/strategies", label: "手法" },

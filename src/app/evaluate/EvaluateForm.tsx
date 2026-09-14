@@ -1,5 +1,5 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import type { StrategyDefinition } from "@/strategies/types";
 import { createAndEvaluate } from "./actions";
 
@@ -12,6 +12,12 @@ export function EvaluateForm({ strategies }: Props) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!pending) { setElapsed(0); return; }
+    const t = setInterval(() => setElapsed((n) => n + 1), 1000);
+    return () => clearInterval(t);
+  }, [pending]);
 
   function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -92,7 +98,7 @@ export function EvaluateForm({ strategies }: Props) {
       </div>
       <aside className="space-y-3">
         <div className="card space-y-3">
-          <button className="btn-primary w-full" disabled={pending}>{pending ? "判定中…(30〜90秒)" : "判定する"}</button>
+          <button className="btn-primary w-full" disabled={pending}>{pending ? `判定中… ${elapsed}s(通常1〜3分)` : "判定する"}</button>
           {error && <p className="text-sm text-red-500">{error}</p>}
           <p className="text-xs text-muted">判定は手法ドキュメントを唯一の基準に行われ、過去にあなたが訂正した判定が校正例として参照されます。</p>
         </div>
