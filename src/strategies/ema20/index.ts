@@ -7,8 +7,8 @@ export const ema20: StrategyDefinition = {
   description:
     "20/200EMAクロス後の初回20EMAタッチ(=エリオット第2波)からの実体ブレイクで第3波を獲る手法。鋭い第一波と転換波動内のTP基準が土台。上位足の方向感・AOIは画像から判定できないため採点対象外。",
   enabled: true,
-  execTimeframes: ["5m", "1h"],
-  higherTimeframes: { "5m": ["30m", "1h"], "1h": ["4h", "D"] },
+  execTimeframes: ["1m", "5m", "1h"],
+  higherTimeframes: { "1m": ["15m", "1h"], "5m": ["15m", "1h"], "1h": ["4h", "D"] },
   resultTitle: "20EMA手法 エントリー評価",
   higherTfLabel: "上位足",
   observations: [

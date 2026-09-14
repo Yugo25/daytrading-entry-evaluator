@@ -43,7 +43,7 @@ export interface StrategyDefinition {
   description: string;
   enabled: boolean;
   execTimeframes: string[]; // ["5m", "1h"]
-  higherTimeframes: Record<string, string[]>; // { "5m": ["30m","1h"], "1h": ["4h","D"] }
+  higherTimeframes: Record<string, string[]>; // { "1m": ["15m","1h"], "5m": ["15m","1h"], "1h": ["4h","D"] }
   observations: ObservationItem[];
   axes: Axis[];
   verdicts: VerdictLabel[];

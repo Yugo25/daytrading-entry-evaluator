@@ -7,8 +7,8 @@ export const ema200: StrategyDefinition = {
   description:
     "20/200EMAクロスで方向感を確定し、200EMAタッチ後の調整波スイング高安値を結ぶ切り下げ/切り上げラインの実体ブレイクでエントリー。上位足200EMAの傾きをSTEP 0フィルターとする。",
   enabled: true,
-  execTimeframes: ["5m", "1h"],
-  higherTimeframes: { "5m": ["30m", "1h"], "1h": ["4h", "D"] },
+  execTimeframes: ["1m", "5m", "1h"],
+  higherTimeframes: { "1m": ["15m", "1h"], "5m": ["15m", "1h"], "1h": ["4h", "D"] },
   resultTitle: "ライン評価結果",
   observations: [
     { key: "①", label: "推進波", hint: "方向/時間幅/値幅/EMAクロスの有無(=N計算・規模比較の基準)" },
