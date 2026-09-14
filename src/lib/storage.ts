@@ -6,7 +6,7 @@ import { put, get, del } from "@vercel/blob";
 // 画像ストレージ。BLOB_READ_WRITE_TOKEN があれば Vercel Blob(private)、無ければローカルFS。
 // DBには相対パス(pathname)だけを保存し、配信は常に /api/files 経由(ログイン必須)で行う。
 const useBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-const DATA_DIR = path.resolve(process.cwd(), process.env.DATA_DIR ?? "./data");
+const DATA_DIR = path.resolve(/*turbopackIgnore: true*/ process.cwd(), process.env.DATA_DIR ?? "./data");
 const UPLOADS = path.join(DATA_DIR, "uploads");
 
 function safeJoin(rel: string) {
