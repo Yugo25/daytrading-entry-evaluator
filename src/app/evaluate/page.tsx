@@ -1,6 +1,8 @@
 import { enabledStrategies } from "@/strategies";
 import { EvaluateForm } from "./EvaluateForm";
 
+export const maxDuration = 300;
+
 export default function EvaluatePage() {
   const strategies = enabledStrategies().map(({ id, name, execTimeframes, higherTimeframes }) => ({ id, name, execTimeframes, higherTimeframes }));
   return (

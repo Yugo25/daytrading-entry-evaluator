@@ -1,8 +1,9 @@
+import "dotenv/config";
 // NotionのTrading Journal週次CSVをインポートする。
 // usage: node scripts/import-notion-csv.ts <csv path> ["週テーマ"]
 import fs from "node:fs";
 import { PrismaClient } from "../src/generated/prisma/client.js";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { weekStart, weekEnd } from "../src/lib/journal.js";
 
 const [, , csvPath, theme] = process.argv;
@@ -27,8 +28,7 @@ function parseCsv(text: string): Record<string, string>[] {
 const strategyMap: Record<string, string> = { "200EMA": "ema200", "20EMA": "ema20" };
 const num = (s: string) => { const n = Number(s.replace("%", "")); return Number.isFinite(n) && s !== "" ? n : null; };
 
-const url = (process.env.DATABASE_URL ?? "file:./data/app.db").replace(/^file:/, "");
-const prisma = new PrismaClient({ adapter: new PrismaBetterSqlite3({ url }) });
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }) });
 
 const records = parseCsv(fs.readFileSync(csvPath, "utf8"));
 let imported = 0;

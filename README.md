@@ -54,20 +54,34 @@ scripts/import-notion-csv.mts  NotionのTrading Journal CSVをインポート
 | `/stats` | 成績統計 + **判定精度(同意率)** + **判定器の弱点(訂正された要素)** |
 | `/strategies`, `/strategies/[id]` | 手法の基準・ドキュメントの閲覧 |
 
-## セットアップ
+## セットアップ(ローカル開発)
+
+DBは Postgres(Neon 等)を使う。ローカル開発もクラウド上の同じDBに接続する(SQLiteは廃止)。
 
 ```bash
-cp .env.example .env    # ANTHROPIC_API_KEY を設定(または ant auth login)
-npm install
-npx prisma migrate dev  # data/app.db を作成
+cp .env.example .env    # ANTHROPIC_API_KEY, DATABASE_URL を設定
+npm install             # postinstall で prisma generate
+npm run db:migrate      # マイグレーション適用
 npm run dev
 ```
 
 Notion CSV の取り込み:
 
 ```bash
-npx tsx scripts/import-notion-csv.mts "path/to/週次.csv" "週テーマ"
+npm run import:csv -- "path/to/週次.csv" "週テーマ"
 ```
+
+## デプロイ(Vercel)
+
+1. GitHub に push し、Vercel で Import
+2. Vercel の **Storage** タブから **Neon (Postgres)** と **Blob** を追加 → `DATABASE_URL` / `BLOB_READ_WRITE_TOKEN` が自動で環境変数に入る
+3. 環境変数に `ANTHROPIC_API_KEY`, `APP_PASSWORD`(必須), 必要なら `EVAL_MODEL` / `EVAL_EFFORT` を追加
+4. Deploy。ビルドコマンド(`npm run build`)が `prisma migrate deploy` を実行する
+5. スマホで URL を開き「ホーム画面に追加」(PWA マニフェスト対応)
+
+判定は1〜3分かかるため、`/evaluate` と `/setups/[id]` に `maxDuration = 300` を指定している(Vercel Hobby でも Fluid compute で最大300秒)。
+
+ローカルから同じDBに接続するには `vercel env pull .env` で環境変数を取得する。
 
 ## 新しい手法を追加する
 
@@ -76,8 +90,3 @@ npx tsx scripts/import-notion-csv.mts "path/to/週次.csv" "週テーマ"
 3. `src/strategies/index.ts` の配列に追加し `enabled: true`
 
 判定・レビュー・ジャーナル・統計は自動で対応する。
-
-## クラウド配置(Vercel等)の前に
-
-- `APP_PASSWORD` を必ず設定する(未設定だと認証なし)
-- SQLite + ローカルFSはサーバーレスでは永続しない → `DATABASE_URL` を Postgres に変え `src/lib/db.ts` のアダプタを `@prisma/adapter-pg` に、`src/lib/storage.ts` を Vercel Blob / S3 実装に差し替える(インターフェースは同じ3関数)

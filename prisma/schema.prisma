@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // 週単位のジャーナルページ(Notionの「8/23-8/28 +0.84」に相当)

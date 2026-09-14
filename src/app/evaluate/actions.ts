@@ -14,7 +14,7 @@ async function storeImages(setupId: string, files: File[], role: string, startOr
     if (!allowed.has(f.type)) throw new Error(`未対応の画像形式: ${f.type}`);
     const ext = f.type.split("/")[1].replace("jpeg", "jpg");
     const rel = `${setupId}/${role.toLowerCase()}-${order}.${ext}`;
-    await saveFile(rel, Buffer.from(await f.arrayBuffer()));
+    await saveFile(rel, Buffer.from(await f.arrayBuffer()), f.type);
     await prisma.setupImage.create({ data: { setupId, role, path: rel, mimeType: f.type, order: order++ } });
   }
   return order;

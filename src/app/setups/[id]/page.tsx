@@ -7,8 +7,11 @@ import type { EvaluationOutput } from "@/lib/evaluator/schema";
 import { EvaluationView } from "@/components/EvaluationView";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { ReviewForm } from "./ReviewForm";
+import { deleteSetup } from "./actions";
 import { reEvaluate } from "@/app/evaluate/actions";
 import { fmtDateJst } from "@/lib/journal";
+
+export const maxDuration = 300;
 
 export default async function SetupPage({ params, searchParams }: PageProps<"/setups/[id]">) {
   const { id } = await params;
@@ -44,6 +47,7 @@ export default async function SetupPage({ params, searchParams }: PageProps<"/se
             <Link href={`/journal/new?setupId=${setup.id}`} className="btn-ghost">この判定からトレード記録を作る</Link>
           )}
           <form action={reEvaluate.bind(null, setup.id)}><button className="btn-ghost">再判定</button></form>
+          <form action={deleteSetup.bind(null, setup.id)}><button className="btn-ghost text-red-600">削除</button></form>
         </div>
       </div>
 
