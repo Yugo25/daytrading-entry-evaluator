@@ -4,7 +4,7 @@ import type { EvaluationOutput } from "./schema";
 /** 構造化出力をスキルの出力テンプレートと同一構成のMarkdownに変換する */
 export function renderEvaluation(strategy: StrategyDefinition, out: EvaluationOutput): string {
   const lines: string[] = [];
-  lines.push("## ライン評価結果");
+  lines.push(`## ${strategy.resultTitle ?? "評価結果"}`);
   lines.push(`方向: ${out.direction}`);
   lines.push("");
   lines.push("### 観察");
@@ -32,8 +32,11 @@ export function renderEvaluation(strategy: StrategyDefinition, out: EvaluationOu
   lines.push("|---|---|");
   lines.push(`| ゲート | ${out.overall.gate} |`);
   lines.push(`| 特則 | ${out.overall.specialRule} |`);
+  for (const r of strategy.overallExtraRows ?? []) {
+    lines.push(`| ${r.label} | ${out.overall.extra?.find((x) => x.key === r.key)?.value ?? "—"} |`);
+  }
   lines.push(`| 主因 | ${out.overall.mainCause} |`);
-  lines.push(`| STEP 0 | ${out.overall.step0} |`);
+  lines.push(`| ${strategy.higherTfLabel ?? "STEP 0"} | ${out.overall.step0} |`);
   if (out.overall.score <= 3 && out.improvements.length) {
     lines.push("");
     lines.push("**改善提案**");

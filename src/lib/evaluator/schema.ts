@@ -32,6 +32,9 @@ export const EvaluationOutputSchema = z.object({
     specialRule: z.string().describe("特則の該当/非該当と根拠"),
     mainCause: z.string().describe("総合点を縛った1要素を15〜40字で"),
     step0: z.string().describe("上位足フィルターの扱い(画像外/参考値)"),
+    extra: z
+      .array(z.object({ key: z.string(), value: z.string() }))
+      .describe("手法固有の追加判定根拠行。出力規約で指定されたキーのみ。指定がなければ空配列"),
   }),
   improvements: z
     .array(z.object({ weakness: z.string(), trigger: z.string() }))

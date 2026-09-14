@@ -50,13 +50,13 @@ export async function evaluateSetup(setupId: string) {
   const content: Anthropic.ContentBlockParam[] = [];
   for (const img of setup.images) {
     const data = (await readFile(img.path)).toString("base64");
-    const roleLabel = img.role === "EXEC" ? "執行足チャート(評価対象)" : img.role === "HIGHER" ? "上位足チャート(STEP 0の参考)" : "補足画像";
+    const roleLabel = img.role === "EXEC" ? "執行足チャート(評価対象)" : img.role === "HIGHER" ? `上位足チャート(${strategy.higherTfLabel ?? "STEP 0"}の参考)` : "補足画像";
     content.push({ type: "text", text: `[${roleLabel}: ${img.mimeType}]` });
     content.push({ type: "image", source: { type: "base64", media_type: img.mimeType as ImageMedia, data } });
   }
   const userLines = [
     `通貨ペア: ${setup.pair}`,
-    `執行足: ${setup.execTf}(STEP 0参照足: ${strategy.higherTimeframes[setup.execTf]?.join("・") ?? "—"})`,
+    `執行足: ${setup.execTf}(${strategy.higherTfLabel ?? "STEP 0"}参照足: ${strategy.higherTimeframes[setup.execTf]?.join("・") ?? "—"})`,
     setup.direction ? `想定方向: ${setup.direction}` : "想定方向: 未指定(画像から読み取る)",
   ];
   if (setup.numericData) userLines.push("数値データ(JSON):", setup.numericData);

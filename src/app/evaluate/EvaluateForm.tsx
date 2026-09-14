@@ -3,7 +3,7 @@ import { useEffect, useState, useTransition } from "react";
 import type { StrategyDefinition } from "@/strategies/types";
 import { createAndEvaluate } from "./actions";
 
-type Props = { strategies: Pick<StrategyDefinition, "id" | "name" | "execTimeframes" | "higherTimeframes">[] };
+type Props = { strategies: Pick<StrategyDefinition, "id" | "name" | "execTimeframes" | "higherTimeframes" | "higherTfLabel">[] };
 
 export function EvaluateForm({ strategies }: Props) {
   const [strategyId, setStrategyId] = useState(strategies[0]?.id ?? "");
@@ -55,7 +55,7 @@ export function EvaluateForm({ strategies }: Props) {
               <select className="input" name="execTf" value={execTf} onChange={(e) => setExecTf(e.target.value)}>
                 {strategy?.execTimeframes.map((tf) => <option key={tf} value={tf}>{tf}</option>)}
               </select>
-              <p className="mt-1 text-[11px] text-muted">STEP 0: {strategy?.higherTimeframes[execTf]?.join("・")}</p>
+              <p className="mt-1 text-[11px] text-muted">{strategy?.higherTfLabel ?? "STEP 0"}: {strategy?.higherTimeframes[execTf]?.join("・")}</p>
             </div>
             <div>
               <label className="label">方向</label>
@@ -80,7 +80,7 @@ export function EvaluateForm({ strategies }: Props) {
             )}
           </div>
           <div>
-            <label className="label">上位足チャート画像(任意・STEP 0の参考)</label>
+            <label className="label">上位足チャート画像(任意・{strategy?.higherTfLabel ?? "STEP 0"}の参考)</label>
             <input className="input" type="file" name="higherImages" accept="image/png,image/jpeg,image/webp" multiple />
           </div>
         </div>

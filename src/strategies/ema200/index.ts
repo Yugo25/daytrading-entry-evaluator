@@ -9,6 +9,7 @@ export const ema200: StrategyDefinition = {
   enabled: true,
   execTimeframes: ["5m", "1h"],
   higherTimeframes: { "5m": ["30m", "1h"], "1h": ["4h", "D"] },
+  resultTitle: "ライン評価結果",
   observations: [
     { key: "①", label: "推進波", hint: "方向/時間幅/値幅/EMAクロスの有無(=N計算・規模比較の基準)" },
     { key: "②", label: "調整波", hint: "起点(推進波の終点ピボット)/時間幅/戻しの深さ/200EMA到達の有無" },

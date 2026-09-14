@@ -49,6 +49,12 @@ export interface StrategyDefinition {
   verdicts: VerdictLabel[];
   specialRules: { key: string; label: string; description: string }[];
   docs: StrategyDoc[];
+  /** 総合評価表に追加する手法固有の行(例: 即見送り / RR)。省略時なし */
+  overallExtraRows?: { key: string; label: string; hint: string }[];
+  /** 結果Markdownの見出し(省略時 "評価結果") */
+  resultTitle?: string;
+  /** 上位足フィルター行・入力欄のラベル(省略時 "STEP 0") */
+  higherTfLabel?: string;
   /** 判定モデルに渡す追加指示(出力形式の固定など) */
   promptNotes?: string;
 }

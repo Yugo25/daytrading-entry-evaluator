@@ -64,7 +64,13 @@ export function EvaluationView({ strategy, out, corrected }: { strategy: Strateg
         <h3 className="mb-2 text-sm font-semibold">総合評価 — {out.overall.score}/5({out.overall.label})</h3>
         <table className="w-full text-sm">
           <tbody>
-            {[["ゲート", out.overall.gate], ["特則", out.overall.specialRule], ["主因", out.overall.mainCause], ["STEP 0", out.overall.step0]].map(([k, v]) => (
+            {[
+              ["ゲート", out.overall.gate],
+              ["特則", out.overall.specialRule],
+              ...(strategy.overallExtraRows ?? []).map((r) => [r.label, out.overall.extra?.find((x) => x.key === r.key)?.value ?? "—"]),
+              ["主因", out.overall.mainCause],
+              [strategy.higherTfLabel ?? "STEP 0", out.overall.step0],
+            ].map(([k, v]) => (
               <tr key={k} className="border-t border-border"><td className="w-20 py-1.5 text-muted">{k}</td><td className="py-1.5">{v}</td></tr>
             ))}
           </tbody>

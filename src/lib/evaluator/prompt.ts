@@ -38,6 +38,9 @@ export function buildSystemPrompt(strategy: StrategyDefinition) {
     `- axes は ${strategy.axes.map((a) => `${a.key}(要素: ${a.elements.map((e) => e.key).join(",")})`).join(" / ")} を全て含める。`,
     `- overall.label は次の固定5種から選ぶ: ${strategy.verdicts.map((v) => v.label).join(" / ")}`,
     "- 総合点は各軸の低い方を上限とするゲート方式。特則は陽性確認できた場合のみ発動する。",
+    strategy.overallExtraRows?.length
+      ? `- overall.extra は次のキーを全て含める: ${strategy.overallExtraRows.map((r) => `${r.key}(${r.label}: ${r.hint})`).join(" / ")}`
+      : "- overall.extra は空配列。",
     "- improvements は総合3以下のときのみ。4以上なら空配列。",
   );
   return parts.join("\n");
