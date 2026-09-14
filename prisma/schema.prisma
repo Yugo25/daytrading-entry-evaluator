@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// 週単位のジャーナルページ(Notionの「8/23-8/28 +0.84」に相当)
+model Week {
+  id        String   @id @default(cuid())
+  startDate DateTime
+  endDate   DateTime
+  theme     String?  // 週テーマ(例: 魚がかかるまではゆっくり待つ。待つのが仕事。)
+  review    String?  // 週次振り返り(自由記述 / AIレポート)
+  trades    Trade[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([startDate])
+}
+
+// 判定に投入されたエントリー候補
+model Setup {
+  id          String   @id @default(cuid())
+  strategyId  String   // "ema200" | "ema20" ...
+  pair        String
+  direction   String?  // LONG | SHORT (未指定可 → AIが読み取る)
+  execTf      String   // 執行足 5m | 1h
+  notes       String?  // ユーザーメモ(自己分析・エントリー根拠)
+  numericData String?  // JSON: A/B/E/X 等の数値入力(任意)
+  images      SetupImage[]
+  evaluations Evaluation[]
+  trade       Trade?
+  createdAt   DateTime @default(now())
+}
+
+model SetupImage {
+  id       String @id @default(cuid())
+  setupId  String
+  setup    Setup  @relation(fields: [setupId], references: [id], onDelete: Cascade)
+  role     String // EXEC(執行足) | HIGHER(上位足) | OTHER
+  path     String // ストレージ内の相対パス
+  mimeType String
+  order    Int    @default(0)
+}
+
+// AIの判定結果(手法基準への適合)
+model Evaluation {
+  id              String   @id @default(cuid())
+  setupId         String
+  setup           Setup    @relation(fields: [setupId], references: [id], onDelete: Cascade)
+  strategyId      String
+  strategyVersion String   // 判定時の手法ドキュメントのハッシュ(基準追跡用)
+  model           String
+  structured      String   // JSON: EvaluationOutput
+  rendered        String   // テンプレート準拠のMarkdown
+  overallScore    Int
+  overallLabel    String
+  fewShotIds      String   // JSON: 参照したReviewのID配列
+  inputTokens     Int?
+  outputTokens    Int?
+  review          Review?
+  createdAt       DateTime @default(now())
+}
+
+// ユーザーによる判定の訂正 = 判定器の学習データ
+model Review {
+  id                String     @id @default(cuid())
+  evaluationId      String     @unique
+  evaluation        Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  agree             Boolean    // AI判定に同意するか
+  correctedScore    Int?       // 正しい総合点(不同意時)
+  correctedElements String?    // JSON: { S1: "○", K4: "×", ... } 訂正した要素のみ
+  comment           String     // なぜ違うのか / 何を見落としたか(最重要)
+  useAsExample      Boolean    @default(true) // 参照例として使うか
+  createdAt         DateTime   @default(now())
+}
+
+// トレード記録(ジャーナル行)。判定と紐づいていても、いなくてもよい
+model Trade {
+  id               String    @id @default(cuid())
+  weekId           String?
+  week             Week?     @relation(fields: [weekId], references: [id])
+  setupId          String?   @unique
+  setup            Setup?    @relation(fields: [setupId], references: [id])
+  journalNo        Int?      // 週内の連番(1. EURAUD の「1」)
+  date             DateTime  // エントリー時刻
+  holdTime         String?   // 4h / 11h35m / 1d10h
+  pair             String
+  strategyId       String    // Type: ema200 / ema20
+  execTf           String    // TF: 5m / 1h
+  lineGrade        String?   // Line: S / A / B / None
+  aoiGrade         String?   // AOI: S / A / B / None
+  outcome          String    // WIN | BE | LOSS
+  riskPct          Float?    // 0.5
+  rrr              Float?    // 1.5
+  resultPct        Float?    // -0.49
+  market           String?   // Tokyo | London | NY
+  ruleCompliance   Boolean   @default(true)
+  violationContent String?
+  violationMotive  String?
+  analysis         String?   // 考察
+  psychology       String?   // 心理
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}

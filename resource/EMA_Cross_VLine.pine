@@ -1,0 +1,59 @@
+//@version=5
+indicator("EMA Cross Vertical Line", shorttitle="EMA X VLine", overlay=true)
+
+// ===== Inputs =====
+fastLen     = input.int(20,  "Fast EMA Length", minval=1)
+slowLen     = input.int(200, "Slow EMA Length", minval=1)
+goldenColor = input.color(color.lime, "Golden Cross Color")
+deadColor   = input.color(color.red,  "Dead Cross Color")
+touchCooldown = input.int(5, "Ignore Touches Within N Bars After Cross", minval=0)
+
+// ===== Calculations =====
+fastEMA = ta.ema(close, fastLen)
+slowEMA = ta.ema(close, slowLen)
+
+plot(fastEMA, "Fast EMA", color=color.aqua,   linewidth=2)
+plot(slowEMA, "Slow EMA", color=color.orange, linewidth=2)
+
+goldenCross = ta.crossover(fastEMA,  slowEMA)
+deadCross   = ta.crossunder(fastEMA, slowEMA)
+
+// ===== Drawing state =====
+var line  crossLine      = na
+var label fastTouchLabel = na
+var label slowTouchLabel = na
+var int   lastCrossBar   = na
+var bool  lastIsGolden   = false
+var bool  fastTouched    = false
+var bool  slowTouched    = false
+
+if barstate.isconfirmed
+    // --- New cross: redraw vertical line, clear previous touch marks ---
+    if goldenCross or deadCross
+        col = goldenCross ? goldenColor : deadColor
+
+        if not na(crossLine)
+            line.delete(crossLine)
+        crossLine := line.new(bar_index, low, bar_index, high, extend=extend.both, color=col, width=1, style=line.style_solid)
+
+        if not na(fastTouchLabel)
+            label.delete(fastTouchLabel)
+            fastTouchLabel := na
+        if not na(slowTouchLabel)
+            label.delete(slowTouchLabel)
+            slowTouchLabel := na
+
+        lastCrossBar := bar_index
+        lastIsGolden := goldenCross
+        fastTouched  := false
+        slowTouched  := false
+
+    // --- First touch of each EMA after the latest cross ---
+    if not na(lastCrossBar) and bar_index - lastCrossBar > touchCooldown
+        col = lastIsGolden ? goldenColor : deadColor
+        if not fastTouched and low <= fastEMA and high >= fastEMA
+            fastTouched := true
+            fastTouchLabel := label.new(bar_index, fastEMA, "", style=label.style_circle, color=col, size=size.tiny)
+        if not slowTouched and low <= slowEMA and high >= slowEMA
+            slowTouched := true
+            slowTouchLabel := label.new(bar_index, slowEMA, "", style=label.style_circle, color=col, size=size.small)

@@ -1,0 +1,43 @@
+//@version=5
+indicator("EMA 20/200 MTF Cross Table", overlay=true)
+
+// ===== 設定 =====
+fastLen   = input.int(20,  "Fast EMA",  minval=1)
+slowLen   = input.int(200, "Slow EMA",  minval=1)
+tablePos  = input.string("top_right", "テーブル位置",
+     options=["top_right","top_left","bottom_right","bottom_left","middle_right","middle_left"])
+upColor   = input.color(color.new(color.green, 0), "↑ (GC) 色")
+dnColor   = input.color(color.new(color.red,   0), "↓ (DC) 色")
+bgColor   = input.color(color.new(color.black, 70), "背景色")
+txtColor  = input.color(color.white, "文字色")
+
+// ===== 各TFのEMA差をsecurityで取得 =====
+// 差(fast - slow)の符号で GC / DC を判定
+f_diff() => ta.ema(close, fastLen) - ta.ema(close, slowLen)
+
+d30  = request.security(syminfo.tickerid, "30",  f_diff(), lookahead=barmerge.lookahead_off)
+d60  = request.security(syminfo.tickerid, "60",  f_diff(), lookahead=barmerge.lookahead_off)
+d240 = request.security(syminfo.tickerid, "240", f_diff(), lookahead=barmerge.lookahead_off)
+dD   = request.security(syminfo.tickerid, "D",   f_diff(), lookahead=barmerge.lookahead_off)
+
+arrow(diff) => diff > 0 ? "↑" : diff < 0 ? "↓" : "→"
+acol(diff)  => diff > 0 ? upColor : diff < 0 ? dnColor : color.gray
+
+// ===== テーブル描画 =====
+var table t = table.new(tablePos, 2, 5, bgcolor=bgColor, border_width=1)
+
+if barstate.islast
+    table.cell(t, 0, 0, "TF",  text_color=txtColor, bgcolor=color.new(color.gray, 60))
+    table.cell(t, 1, 0, "20/200", text_color=txtColor, bgcolor=color.new(color.gray, 60))
+
+    table.cell(t, 0, 1, "30m", text_color=txtColor)
+    table.cell(t, 1, 1, arrow(d30),  text_color=acol(d30))
+
+    table.cell(t, 0, 2, "1h",  text_color=txtColor)
+    table.cell(t, 1, 2, arrow(d60),  text_color=acol(d60))
+
+    table.cell(t, 0, 3, "4h",  text_color=txtColor)
+    table.cell(t, 1, 3, arrow(d240), text_color=acol(d240))
+
+    table.cell(t, 0, 4, "D",   text_color=txtColor)
+    table.cell(t, 1, 4, arrow(dD),   text_color=acol(dD))

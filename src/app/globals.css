@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f7f5;
+  --foreground: #16181d;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #1d4ed8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f1115;
+    --foreground: #e6e7ea;
+    --card: #171a21;
+    --muted: #9aa0ab;
+    --border: #2a2f3a;
+    --accent: #60a5fa;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.prose-eval table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1rem; font-size: 0.875rem; }
+.prose-eval th, .prose-eval td { border: 1px solid var(--border); padding: 0.375rem 0.5rem; text-align: left; vertical-align: top; }
+.prose-eval th { background: color-mix(in srgb, var(--border) 40%, transparent); }
+.prose-eval h2 { font-size: 1.125rem; font-weight: 600; margin-top: 1rem; }
+.prose-eval h3 { font-size: 1rem; font-weight: 600; margin-top: 1.25rem; }
+.prose-eval p { margin: 0.5rem 0; }
+
+.input { @apply w-full rounded-md border border-border bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/40; }
+.btn-primary { @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition disabled:opacity-50 bg-accent text-white hover:opacity-90; }
+.btn-ghost { @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition disabled:opacity-50 border border-border bg-card hover:bg-border/40; }
+.card { @apply rounded-lg border border-border bg-card p-4; }
+.label { @apply mb-1 block text-xs font-medium text-muted; }
