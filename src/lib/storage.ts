@@ -3,13 +3,19 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { put, get, del } from "@vercel/blob";
 
-// 画像ストレージ。BLOB_READ_WRITE_TOKEN があれば Vercel Blob(private)、無ければローカルFS。
+// 画像ストレージ。Vercel Blob(private) が使えればそれを、無ければローカルFS。
+// Blob の認証は2通り: BLOB_STORE_ID + OIDC(Vercel 上で自動発行。現在の Storage 連携の既定)、
+// または従来の BLOB_READ_WRITE_TOKEN。どちらかがあれば Blob を使う。
 // DBには相対パス(pathname)だけを保存し、配信は常に /api/files 経由(ログイン必須)で行う。
-const useBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+const useBlob = Boolean(process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN);
 const DATA_DIR = path.resolve(/*turbopackIgnore: true*/ process.cwd(), process.env.DATA_DIR ?? "./data");
 const UPLOADS = path.join(DATA_DIR, "uploads");
 
 function safeJoin(rel: string) {
+  // Vercel のファイルシステムは読み取り専用。トークン未設定のままローカル保存に落ちると ENOENT になるため先に説明する
+  if (process.env.VERCEL) {
+    throw new Error("Blob の環境変数(BLOB_STORE_ID または BLOB_READ_WRITE_TOKEN)がありません。Vercel の Storage で Blob をプロジェクトに接続し、Redeploy してください");
+  }
   const p = path.resolve(UPLOADS, rel);
   if (!p.startsWith(UPLOADS + path.sep)) throw new Error("invalid path");
   return p;

@@ -74,7 +74,7 @@ npm run import:csv -- "path/to/週次.csv" "週テーマ"
 ## デプロイ(Vercel)
 
 1. GitHub に push し、Vercel で Import
-2. Vercel の **Storage** タブから **Neon (Postgres)** と **Blob** を追加 → `DATABASE_URL` / `BLOB_READ_WRITE_TOKEN` が自動で環境変数に入る
+2. Vercel の **Storage** タブから **Neon (Postgres)** と **Blob** を追加 → `DATABASE_URL` / `BLOB_STORE_ID`(Blob は OIDC 認証。旧来の `BLOB_READ_WRITE_TOKEN` でも可)が自動で環境変数に入る
 3. 環境変数に `ANTHROPIC_API_KEY`, `APP_PASSWORD`(必須), 必要なら `EVAL_MODEL` / `EVAL_EFFORT` を追加
 4. Deploy。ビルドコマンド(`npm run build`)が `prisma migrate deploy` を実行する
 5. スマホで URL を開き「ホーム画面に追加」(PWA マニフェスト対応)
