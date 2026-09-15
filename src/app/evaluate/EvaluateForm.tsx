@@ -2,8 +2,9 @@
 import { useEffect, useState, useTransition } from "react";
 import type { StrategyDefinition } from "@/strategies/types";
 import { createAndEvaluate } from "./actions";
+import { shrinkFormImages } from "@/lib/image-client";
 
-type Props = { strategies: Pick<StrategyDefinition, "id" | "name" | "execTimeframes" | "higherTimeframes" | "higherTfLabel">[] };
+type Props = { strategies: Pick<StrategyDefinition, "id" | "name" | "execTimeframes" | "higherTimeframes" | "higherTfLabel" | "numericPlaceholder">[] };
 
 export function EvaluateForm({ strategies }: Props) {
   const [strategyId, setStrategyId] = useState(strategies[0]?.id ?? "");
@@ -33,6 +34,8 @@ export function EvaluateForm({ strategies }: Props) {
         setError(null);
         start(async () => {
           try {
+            await shrinkFormImages(fd, "execImages");
+            await shrinkFormImages(fd, "higherImages");
             await createAndEvaluate(fd);
           } catch (err) {
             if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) throw err;
@@ -72,7 +75,7 @@ export function EvaluateForm({ strategies }: Props) {
           </div>
           <div>
             <label className="label">執行足チャート画像(評価対象・複数可)</label>
-            <input className="input" type="file" name="execImages" accept="image/png,image/jpeg,image/webp" multiple onChange={onFiles} />
+            <input className="input" type="file" name="execImages" accept="image/*" multiple onChange={onFiles} />
             {previews.length > 0 && (
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {previews.map((p) => <img key={p} src={p} alt="" className="rounded border border-border" />)}
@@ -81,13 +84,13 @@ export function EvaluateForm({ strategies }: Props) {
           </div>
           <div>
             <label className="label">上位足チャート画像(任意・{strategy?.higherTfLabel ?? "STEP 0"}の参考)</label>
-            <input className="input" type="file" name="higherImages" accept="image/png,image/jpeg,image/webp" multiple />
+            <input className="input" type="file" name="higherImages" accept="image/*" multiple />
           </div>
         </div>
         <div className="card space-y-4">
           <div>
             <label className="label">数値データ(任意・JSON)</label>
-            <textarea className="input font-mono text-xs" name="numericData" rows={4} placeholder='{"A": 1.9930, "B": 1.9905, "E": 1.9910, "X": 1.99194, "sl": 1.9900, "tp": 1.9990}' />
+            <textarea className="input font-mono text-xs" name="numericData" rows={4} placeholder={strategy?.numericPlaceholder ?? '{"entry": 0, "sl": 0, "tp": 0}'} />
             <p className="mt-1 text-[11px] text-muted">K4の戻し率 r や RRR の検算に使われます。画像だけでも判定できます。</p>
           </div>
           <div>

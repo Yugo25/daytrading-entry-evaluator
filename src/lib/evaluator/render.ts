@@ -1,5 +1,5 @@
 import type { StrategyDefinition } from "@/strategies/types";
-import type { EvaluationOutput } from "./schema";
+import { overallRow, type EvaluationOutput } from "./schema";
 
 /** 構造化出力をスキルの出力テンプレートと同一構成のMarkdownに変換する */
 export function renderEvaluation(strategy: StrategyDefinition, out: EvaluationOutput): string {
@@ -30,13 +30,7 @@ export function renderEvaluation(strategy: StrategyDefinition, out: EvaluationOu
   lines.push(`### 総合評価 — ${out.overall.score}/5(${out.overall.label})`);
   lines.push("| 判定根拠 | 内容 |");
   lines.push("|---|---|");
-  lines.push(`| ゲート | ${out.overall.gate} |`);
-  lines.push(`| 特則 | ${out.overall.specialRule} |`);
-  for (const r of strategy.overallExtraRows ?? []) {
-    lines.push(`| ${r.label} | ${out.overall.extra?.find((x) => x.key === r.key)?.value ?? "—"} |`);
-  }
-  lines.push(`| 主因 | ${out.overall.mainCause} |`);
-  lines.push(`| ${strategy.higherTfLabel ?? "STEP 0"} | ${out.overall.step0} |`);
+  for (const r of strategy.overallRows) lines.push(`| ${r.label} | ${overallRow(out, r.key)} |`);
   if (out.overall.score <= 3 && out.improvements.length) {
     lines.push("");
     lines.push("**改善提案**");

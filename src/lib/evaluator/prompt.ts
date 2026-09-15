@@ -1,7 +1,7 @@
 import "server-only";
 import type { StrategyDefinition } from "@/strategies/types";
 import { readStrategyDocs } from "@/strategies/docs";
-import type { EvaluationOutput } from "./schema";
+import { overallRow, type EvaluationOutput } from "./schema";
 
 export interface FewShotExample {
   reviewId: string;
@@ -37,10 +37,8 @@ export function buildSystemPrompt(strategy: StrategyDefinition) {
     `- observations は次のキーを全て含める: ${strategy.observations.map((o) => o.key).join(", ")}`,
     `- axes は ${strategy.axes.map((a) => `${a.key}(要素: ${a.elements.map((e) => e.key).join(",")})`).join(" / ")} を全て含める。`,
     `- overall.label は次の固定5種から選ぶ: ${strategy.verdicts.map((v) => v.label).join(" / ")}`,
-    "- 総合点は各軸の低い方を上限とするゲート方式。特則は陽性確認できた場合のみ発動する。",
-    strategy.overallExtraRows?.length
-      ? `- overall.extra は次のキーを全て含める: ${strategy.overallExtraRows.map((r) => `${r.key}(${r.label}: ${r.hint})`).join(" / ")}`
-      : "- overall.extra は空配列。",
+    strategy.axes.length > 1 ? "- 総合点は各軸の低い方を上限とするゲート方式。特則は陽性確認できた場合のみ発動する。" : "- 軸が1つの場合、その軸スコア = 総合点(換算表に従う)。",
+    `- overall.rows は次のキーをこの順で全て含める: ${strategy.overallRows.map((r) => `${r.key}(${r.label}: ${r.hint})`).join(" / ")}`,
     "- improvements は総合3以下のときのみ。4以上なら空配列。",
   );
   return parts.join("\n");
@@ -65,7 +63,7 @@ export function buildFewShotBlock(examples: FewShotExample[]) {
       .join(" / ");
     lines.push(`<example pair="${ex.pair}" tf="${ex.execTf}" verdict="${ex.agree ? "同意" : "不同意"}">`);
     lines.push(`AI判定: 総合${ex.aiOutput.overall.score} ${ex.aiOutput.overall.label} / ${marks}`);
-    lines.push(`主因: ${ex.aiOutput.overall.mainCause}`);
+    lines.push(`主因: ${overallRow(ex.aiOutput, "mainCause")}`);
     if (!ex.agree) {
       if (ex.correctedScore != null) lines.push(`正しい総合点: ${ex.correctedScore}`);
       if (ex.correctedElements && Object.keys(ex.correctedElements).length)

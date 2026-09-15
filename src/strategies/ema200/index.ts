@@ -10,6 +10,7 @@ export const ema200: StrategyDefinition = {
   execTimeframes: ["1m", "5m", "1h"],
   higherTimeframes: { "1m": ["15m", "1h"], "5m": ["15m", "1h"], "1h": ["4h", "D"] },
   resultTitle: "ライン評価結果",
+  numericPlaceholder: '{"A": 1.9930, "B": 1.9905, "E": 1.9910, "X": 1.99194, "sl": 1.9900, "tp": 1.9990}',
   observations: [
     { key: "①", label: "推進波", hint: "方向/時間幅/値幅/EMAクロスの有無(=N計算・規模比較の基準)" },
     { key: "②", label: "調整波", hint: "起点(推進波の終点ピボット)/時間幅/戻しの深さ/200EMA到達の有無" },
@@ -55,6 +56,12 @@ export const ema200: StrategyDefinition = {
   specialRules: [
     { key: "squeeze", label: "スクイーズ", description: "ラインと200EMAの収束ウェッジ内で3本以上のボラ収縮+両境界への交互タッチが陽性確認された場合のみ → 総合上限2" },
     { key: "sticking", label: "EMA張り付き", description: "接触ゾーン3本以上で c≥3 または a≤0.15 が陽性確認された場合のみ → 総合上限2" },
+  ],
+  overallRows: [
+    { key: "gate", label: "ゲート", hint: "例: min(軸1 4, 軸2 3)= 3" },
+    { key: "specialRule", label: "特則", hint: "スクイーズ/EMA張り付きの該当/非該当と根拠" },
+    { key: "mainCause", label: "主因", hint: "総合点を縛った1要素を15〜40字で" },
+    { key: "step0", label: "STEP 0", hint: "上位足フィルターの扱い(画像外/参考値)" },
   ],
   docs: [
     { name: "判定スキル(trendline-eval)", path: "SKILL.md", role: "skill" },

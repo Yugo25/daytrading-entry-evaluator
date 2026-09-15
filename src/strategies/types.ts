@@ -15,6 +15,7 @@ export interface CriterionElement {
   core: boolean; // 中核要素か(×で軸スコア上限2)
   pass: string; // ○の基準
   fail: string; // ×の典型
+  partial?: string; // △の基準(手法が明示している場合)
 }
 
 export interface Axis {
@@ -49,10 +50,12 @@ export interface StrategyDefinition {
   verdicts: VerdictLabel[];
   specialRules: { key: string; label: string; description: string }[];
   docs: StrategyDoc[];
-  /** 総合評価表に追加する手法固有の行(例: 即見送り / RR)。省略時なし */
-  overallExtraRows?: { key: string; label: string; hint: string }[];
+  /** 総合評価表の行(手法固有)。モデルは overall.rows にこのキーで値を返す。mainCause は必ず含める */
+  overallRows: { key: string; label: string; hint: string }[];
   /** 結果Markdownの見出し(省略時 "評価結果") */
   resultTitle?: string;
+  /** 数値データ入力欄のプレースホルダ(手法が要求する価格のキー例) */
+  numericPlaceholder?: string;
   /** 上位足フィルター行・入力欄のラベル(省略時 "STEP 0") */
   higherTfLabel?: string;
   /** 判定モデルに渡す追加指示(出力形式の固定など) */

@@ -23,8 +23,8 @@ export default async function StrategyPage({ params }: PageProps<"/strategies/[i
           {s.axes.map((a, i) => (
             <div key={a.key} className="card">
               <h2 className="mb-2 text-sm font-semibold">軸{i + 1}: {a.label} <span className="font-normal text-muted">— {a.subtitle}</span></h2>
-              <table className="w-full text-xs"><thead className="text-left text-muted"><tr><th className="py-1">要素</th><th><Mark mark="○" /> の基準</th><th><Mark mark="×" /> の典型</th></tr></thead>
-                <tbody>{a.elements.map((e) => <tr key={e.key} className="border-t border-border align-top"><td className="py-1.5 pr-2 whitespace-nowrap"><span className="font-mono">{e.key}</span> {e.label}{e.core && <span className="ml-1 text-[10px] text-muted">中核</span>}</td><td className="py-1.5 pr-2">{e.pass}</td><td className="py-1.5">{e.fail}</td></tr>)}</tbody>
+              <table className="w-full text-xs"><thead className="text-left text-muted"><tr><th className="py-1">要素</th><th><Mark mark="○" /> の基準</th>{a.elements.some((e) => e.partial) && <th><Mark mark="△" /> の基準</th>}<th><Mark mark="×" /> の典型</th></tr></thead>
+                <tbody>{a.elements.map((e) => <tr key={e.key} className="border-t border-border align-top"><td className="py-1.5 pr-2 whitespace-nowrap"><span className="font-mono">{e.key}</span> {e.label}{e.core && <span className="ml-1 text-[10px] text-muted">中核</span>}</td><td className="py-1.5 pr-2">{e.pass}</td>{a.elements.some((x) => x.partial) && <td className="py-1.5 pr-2">{e.partial}</td>}<td className="py-1.5">{e.fail}</td></tr>)}</tbody>
               </table>
             </div>
           ))}
