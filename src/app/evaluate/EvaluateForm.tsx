@@ -36,10 +36,12 @@ export function EvaluateForm({ strategies }: Props) {
           try {
             await shrinkFormImages(fd, "execImages");
             await shrinkFormImages(fd, "higherImages");
-            await createAndEvaluate(fd);
+            const result = await createAndEvaluate(fd);
+            if (result?.error) setError(result.error);
           } catch (err) {
             if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) throw err;
-            setError(err instanceof Error ? err.message : "判定に失敗しました");
+            const msg = err instanceof Error ? err.message : "判定に失敗しました";
+            setError(msg.includes("#441") ? `サーバー側でエラー(送信サイズ超過の可能性)。画像を減らすか再試行してください: ${msg}` : msg);
           }
         });
       }}

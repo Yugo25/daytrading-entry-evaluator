@@ -20,7 +20,21 @@ async function storeImages(setupId: string, files: File[], role: string, startOr
   return order;
 }
 
-export async function createAndEvaluate(formData: FormData) {
+// 本番では Server Action 内の throw は React error #441 に丸められ原因が見えないため、
+// 入力・保存段階のエラーは戻り値で返してフォームに表示する。判定段階のエラーは詳細ページに引き継ぐ。
+export async function createAndEvaluate(formData: FormData): Promise<{ error: string } | void> {
+  let setupId: string;
+  try {
+    setupId = await createSetup(formData);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("createSetup failed:", e);
+    return { error: msg };
+  }
+  await runEvaluation(setupId);
+}
+
+async function createSetup(formData: FormData) {
   const strategyId = String(formData.get("strategyId"));
   const strategy = getStrategy(strategyId);
   const execTf = String(formData.get("execTf"));
@@ -42,8 +56,7 @@ export async function createAndEvaluate(formData: FormData) {
   const setup = await prisma.setup.create({ data: { strategyId, pair, direction, execTf, notes, numericData } });
   const n = await storeImages(setup.id, execImages, "EXEC", 0);
   await storeImages(setup.id, higherImages, "HIGHER", n);
-
-  await runEvaluation(setup.id);
+  return setup.id;
 }
 
 export async function reEvaluate(setupId: string) {
