@@ -1,92 +1,155 @@
-# Entry Evaluator
+# Daytrading Entry Evaluator
 
-手法基準に基づくデイトレードのセットアップ判定 + トレードジャーナル。
+An AI-powered tool that grades whether a day-trading entry setup **complies with the rules of a written trading strategy**, plus a trade journal and stats dashboard to go with it.
 
-## 設計の核
+Upload a TradingView chart screenshot, and Claude (vision + structured output) scores the setup element-by-element against the strategy's own documentation, then renders a fixed-format report. You review the verdict, correct it when it's wrong, and those corrections become calibration examples for future evaluations.
 
-**これは「手法適合判定器」であり「勝率予測器」ではない。**
+> Built for my own FX / gold day trading using two EMA-based strategies (20EMA and 200EMA). Deployed on Vercel and used from my phone as a PWA.
 
-```
-手法ドキュメント + 判定スキル (src/strategies/<id>/)  ← 固定。人間だけが意図的に改訂する
-        │ 判定の物差し
-        ▼
- Setup 投入 ──▶ Evaluation(AI判定) ──▶ Review(あなたの訂正) ──▶ 次回判定の校正例
- (画像/数値/メモ)   軸・要素・総合・特則        同意 / 不同意+理由         (few-shot)
+## Core idea
 
- Trade(勝敗・RR・心理) は別レーン。ジャーナル・統計に使い、判定ロジックには流さない。
-```
+**This is a strategy-compliance judge, not a win-rate predictor.**
 
-- **判定訂正(Review)** は「同じ基準に対する読み取り精度」を上げるための校正データ。手法基準は変えない。
-- **手法改訂** は `src/strategies/<id>/` のドキュメントを直接編集して行う。編集すると基準バージョン(ハッシュ)が変わり、以後の Evaluation に記録されるので「どの基準で判定されたか」が追跡できる。
+Most "AI trading" tools try to predict whether a trade will win. This one deliberately doesn't. A losing trade can be a perfectly valid setup, and a winning trade can be a rule violation. What matters for long-term edge is *executing the strategy consistently*, so the evaluator answers one question only: **"Does this setup meet the criteria as written?"**
 
-## 構成
-
-```
-src/strategies/            手法プラグイン(判定器・UI・ジャーナルはここだけを見る)
-  types.ts                 StrategyDefinition インターフェース
-  index.ts                 レジストリ(getStrategy / enabledStrategies)
-  docs.ts                  ドキュメント読み込み・基準バージョン算出
-  ema200/                  200EMA手法(有効)
-    index.ts               観察5要素・軸1(S1-S4)・軸2(K1-K4)・判定ラベル・特則・ドキュメント一覧
-    SKILL.md               判定スキル本文(trendline-eval)
-    references/            手法概要・要点・模範例/校正アンカー
-  ema20/index.ts           20EMA手法(準備中: enabled:false)
-src/lib/evaluator/
-  schema.ts                構造化出力の zod スキーマ(手法非依存)
-  prompt.ts                システムプロンプト(手法docs, キャッシュ) + 校正例ブロック
-  evaluate.ts              Claude 呼び出し(vision + structured output) → Evaluation 保存
-  render.ts                構造化出力 → スキルの出力テンプレート形式 Markdown
-src/lib/journal.ts         4象限・セッション推定・週の計算
-src/lib/storage.ts         画像保存(ローカルFS。クラウドでは Blob 実装に差し替え)
-src/lib/auth.ts, proxy.ts  APP_PASSWORD による簡易ログイン
-prisma/schema.prisma       Week / Setup / SetupImage / Evaluation / Review / Trade
-scripts/import-notion-csv.mts  NotionのTrading Journal CSVをインポート
+```mermaid
+flowchart LR
+    subgraph Criteria["Strategy criteria (fixed, edited only by a human)"]
+        D["src/strategies/&lt;id&gt;/<br/>SKILL.md + references"]
+    end
+    S["Setup<br/>chart images · numbers · notes"] --> E["Evaluation<br/>Claude: observations → axes → verdict"]
+    D -- "system prompt (cached)" --> E
+    E --> R["Review<br/>agree / disagree + reason"]
+    R -- "few-shot calibration examples" --> E
+    T["Trade<br/>outcome · RR · psychology"] -.-> J["Journal & Stats"]
+    E -.-> J
 ```
 
-## 画面
+- **Reviews calibrate reading accuracy, never the criteria.** When you correct an evaluation, the correction is fed back as a few-shot example ("last time you missed X"). The strategy rules themselves don't move.
+- **The criteria change only when a human edits the docs** in `src/strategies/<id>/`. Every evaluation stores a hash of the docs (`strategyVersion`), so you can always tell which version of the rules a verdict was made against.
+- **Trade outcomes are a separate lane.** Win/loss, RR and psychology go into the journal and stats, but are never fed into the evaluator. Results never leak back into the rules.
 
-| パス | 内容 |
+## Features
+
+- **Chart evaluation** – upload execution-timeframe (and optionally higher-timeframe) screenshots plus optional numeric prices; get a structured verdict in 1–3 minutes
+- **Strategy-driven scoring** – each strategy defines its own observation elements, scoring axes, ○/△/× element criteria, 5-level verdict labels and hard-cap special rules
+- **Human-in-the-loop calibration** – agree/disagree with each verdict, correct individual elements, and explain why; corrections are reused as few-shot examples
+- **Trade journal** – weekly journal pages (mirroring my Notion layout) with themes, reviews, rule-compliance tracking and a Notion CSV importer
+- **Stats** – P&L, win rate by strategy/session/pair, the rule-compliance × outcome quadrant, **evaluator agreement rate**, and a **weak-spot map** of which elements the evaluator gets corrected on most
+- **Mobile-first PWA** – add it to your home screen; images are shrunk client-side before upload
+- **Pluggable strategies** – add a folder with docs and a definition file; evaluation, review, journal and stats pick it up automatically
+
+## Screenshots
+
+| Evaluate | Result |
 |---|---|
-| `/evaluate` | 手法・執行足・ペア・画像・数値・メモを投入して判定 |
-| `/setups/[id]` | 判定結果(観察/軸/総合/改善提案)・レビュー(訂正)・再判定・トレード記録へのリンク |
-| `/journal` | 週ごとのジャーナル表(Notion CSVと同じ列 + AI判定) ・フィルタ・週テーマ |
-| `/journal/new`, `/trades/[id]` | トレード記録の作成・編集 |
-| `/stats` | 成績統計 + **判定精度(同意率)** + **判定器の弱点(訂正された要素)** |
-| `/strategies`, `/strategies/[id]` | 手法の基準・ドキュメントの閲覧 |
+| ![Evaluate form](docs/screenshots/evaluate.png) | ![Evaluation result](docs/screenshots/result.png) |
 
-## セットアップ(ローカル開発)
+| Journal | Stats |
+|---|---|
+| ![Journal](docs/screenshots/journal.png) | ![Stats](docs/screenshots/stats.png) |
 
-DBは Postgres(Neon 等)を使う。ローカル開発もクラウド上の同じDBに接続する(SQLiteは廃止)。
+## Tech stack
+
+- **Next.js 16** (App Router, Server Actions) + **React 19** + **TypeScript**
+- **Claude API** (`@anthropic-ai/sdk`) – vision input, adaptive thinking, streaming, prompt caching, and **structured outputs validated with Zod**
+- **Prisma 7** + **PostgreSQL** (Neon)
+- **Vercel Blob** for private image storage (falls back to the local filesystem)
+- **Tailwind CSS 4**
+- Deployed on **Vercel**
+
+## How an evaluation works
+
+1. `buildSystemPrompt` (`src/lib/evaluator/prompt.ts`) assembles the strategy's skill document and references into a cached system prompt, plus output rules generated from the strategy definition (required observation keys, axis/element keys, allowed verdict labels).
+2. Up to 8 past reviews for that strategy (disagreements first) are added as calibration examples.
+3. Chart images, pair, timeframe, numbers and notes are sent; Claude returns JSON conforming to `EvaluationOutputSchema` (`src/lib/evaluator/schema.ts`).
+4. `renderEvaluation` (`src/lib/evaluator/render.ts`) turns the JSON into the exact Markdown report format the strategy's skill specifies, and both are stored with the model, token usage, criteria version and the IDs of the examples used.
+
+## Project structure
+
+```
+src/strategies/              Strategy plugins (the evaluator, UI and journal only read from here)
+  types.ts                   StrategyDefinition interface
+  index.ts                   Registry (getStrategy / enabledStrategies)
+  docs.ts                    Doc loading and criteria-version hashing
+  ema200/                    200EMA strategy (trendline break after a 200EMA pullback)
+    index.ts                 5 observations, Axis 1 (S1–S4), Axis 2 (K1–K4), verdicts, special rules, docs
+    SKILL.md                 Evaluation skill (trendline-eval)
+    references/              Strategy overview, key points, model examples / calibration anchors
+  ema20/                     20EMA strategy (first 20EMA pullback after a cross)
+    index.ts, SKILL.md
+src/lib/evaluator/
+  schema.ts                  Zod schema for the structured output (strategy-independent)
+  prompt.ts                  System prompt (strategy docs, cached) + calibration-example block
+  evaluate.ts                Claude call (vision + structured output) → saves Evaluation
+  render.ts                  Structured output → Markdown in the skill's output template
+src/lib/journal.ts           Quadrants, session inference, week helpers
+src/lib/storage.ts           Image storage (Vercel Blob or local FS)
+src/lib/auth.ts, proxy.ts    Simple password login via APP_PASSWORD
+prisma/schema.prisma         Week / Setup / SetupImage / Evaluation / Review / Trade
+scripts/import-notion-csv.mts  Import a Notion Trading Journal CSV
+resource/                    Original Claude skill bundles, TradingView Pine scripts, sample journal export
+```
+
+## Pages
+
+| Path | What it does |
+|---|---|
+| `/evaluate` | Submit strategy, execution timeframe, pair, images, numbers and notes for evaluation |
+| `/setups`, `/setups/[id]` | Evaluation results (observations / axes / overall / improvements), review form, re-evaluate, link to a trade |
+| `/journal` | Weekly journal table (same columns as my Notion CSV + AI score), filters, weekly themes |
+| `/journal/new`, `/trades/[id]` | Create / edit a trade |
+| `/stats` | Performance stats + **evaluator agreement rate** + **evaluator weak spots** |
+| `/strategies`, `/strategies/[id]` | Browse each strategy's criteria and documents |
+
+## Getting started
+
+### Environment variables
+
+Create a `.env` file in the project root:
+
+| Variable | Required | Description |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | ✓ | Claude API key |
+| `DATABASE_URL` | ✓ | PostgreSQL connection string (e.g. Neon) |
+| `APP_PASSWORD` | recommended | Enables the login screen. **Always set it on a public URL** |
+| `EVAL_MODEL` | | Model used for evaluation (default `claude-opus-5`) |
+| `EVAL_EFFORT` | | `low` / `medium` / `high` / `xhigh` / `max` (default `high`; `medium` is faster) |
+| `BLOB_STORE_ID` or `BLOB_READ_WRITE_TOKEN` | | Store images in Vercel Blob (private). Without either, images go to `./data/uploads` |
+| `DATA_DIR` | | Local storage directory (default `./data`) |
+
+### Run locally
 
 ```bash
-cp .env.example .env    # ANTHROPIC_API_KEY, DATABASE_URL を設定
-npm install             # postinstall で prisma generate
-npm run db:migrate      # マイグレーション適用
+npm install             # runs prisma generate via postinstall
+npm run db:migrate      # apply migrations
 npm run dev
 ```
 
-Notion CSV の取り込み:
+Import a Notion journal CSV (see `resource/Trading-log-sample/` for the format; English or the original Japanese column names both work):
 
 ```bash
-npm run import:csv -- "path/to/週次.csv" "週テーマ"
+npm run import:csv -- "path/to/week.csv" "Weekly theme"
 ```
 
-## デプロイ(Vercel)
+### Deploy to Vercel
 
-1. GitHub に push し、Vercel で Import
-2. Vercel の **Storage** タブから **Neon (Postgres)** と **Blob** を追加 → `DATABASE_URL` / `BLOB_STORE_ID`(Blob は OIDC 認証。旧来の `BLOB_READ_WRITE_TOKEN` でも可)が自動で環境変数に入る
-3. 環境変数に `ANTHROPIC_API_KEY`, `APP_PASSWORD`(必須), 必要なら `EVAL_MODEL` / `EVAL_EFFORT` を追加
-4. Deploy。ビルドコマンド(`npm run build`)が `prisma migrate deploy` を実行する
-5. スマホで URL を開き「ホーム画面に追加」(PWA マニフェスト対応)
+1. Push to GitHub and import the repo in Vercel
+2. From the **Storage** tab, add **Neon (Postgres)** and **Blob**; `DATABASE_URL` and `BLOB_STORE_ID` are injected automatically (Blob uses OIDC; the legacy `BLOB_READ_WRITE_TOKEN` also works)
+3. Add `ANTHROPIC_API_KEY`, `APP_PASSWORD`, and optionally `EVAL_MODEL` / `EVAL_EFFORT`
+4. Deploy. The build command (`npm run build`) runs `prisma migrate deploy`
+5. Open the URL on your phone and "Add to Home Screen" (PWA manifest included)
 
-判定は1〜3分かかるため、`/evaluate` と `/setups/[id]` に `maxDuration = 300` を指定している(Vercel Hobby でも Fluid compute で最大300秒)。
+Evaluations take 1–3 minutes, so `/evaluate` and `/setups/[id]` set `maxDuration = 300` (up to 300s with Fluid compute, even on the Hobby plan). To point your local environment at the same database, run `vercel env pull .env`.
 
-ローカルから同じDBに接続するには `vercel env pull .env` で環境変数を取得する。
+## Adding a new strategy
 
-## 新しい手法を追加する
+1. Put the skill document and reference docs in `src/strategies/<id>/`
+2. Define a `StrategyDefinition` in `src/strategies/<id>/index.ts` (observations, axes and elements, verdict labels, special rules, overall rows, docs)
+3. Add it to the array in `src/strategies/index.ts` with `enabled: true`
 
-1. `src/strategies/<id>/` にスキル本文と参照ドキュメントを置く
-2. `src/strategies/<id>/index.ts` で `StrategyDefinition` を定義(観察要素・軸と要素・判定ラベル・特則・docs)
-3. `src/strategies/index.ts` の配列に追加し `enabled: true`
+Evaluation, review, journal and stats support it automatically.
 
-判定・レビュー・ジャーナル・統計は自動で対応する。
+## License
+
+[MIT](LICENSE)
