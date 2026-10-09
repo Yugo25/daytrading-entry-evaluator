@@ -19,22 +19,22 @@ export default async function TradePage({ params }: PageProps<"/trades/[id]">) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">{trade.journalNo}. {trade.pair} <span className="text-base font-normal text-muted">{strategyName(trade.strategyId)} · {trade.execTf}</span></h1>
-        <form action={deleteTrade.bind(null, trade.id)}><button className="btn-ghost text-red-600">削除</button></form>
+        <form action={deleteTrade.bind(null, trade.id)}><button className="btn-ghost text-red-600">Delete</button></form>
       </div>
       {trade.setup ? (
         <section className="card flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-muted">AI判定</span>
-            {ev ? <ScoreBadge score={ev.overallScore} label={ev.overallLabel} /> : <span className="text-sm text-muted">なし</span>}
-            {ev?.review && <span className="text-xs">{ev.review.agree ? "✓ 判定に同意" : `✗ 訂正済み → ${ev.review.correctedScore ?? "?"}/5`}</span>}
+            <span className="text-sm text-muted">AI evaluation</span>
+            {ev ? <ScoreBadge score={ev.overallScore} label={ev.overallLabel} /> : <span className="text-sm text-muted">None</span>}
+            {ev?.review && <span className="text-xs">{ev.review.agree ? "✓ Agreed with evaluation" : `✗ Corrected → ${ev.review.correctedScore ?? "?"}/5`}</span>}
           </div>
-          <Link href={`/setups/${trade.setup.id}`} className="text-sm text-accent hover:underline">判定の詳細 →</Link>
+          <Link href={`/setups/${trade.setup.id}`} className="text-sm text-accent hover:underline">Evaluation details →</Link>
           <div className="flex gap-2">{trade.setup.images.slice(0, 3).map((img) => <img key={img.id} src={fileUrl(img.path)} alt="" className="h-16 rounded border border-border" />)}</div>
         </section>
       ) : (
-        <p className="text-sm text-muted">このトレードには判定が紐づいていません。<Link href="/evaluate" className="text-accent hover:underline">判定する</Link></p>
+        <p className="text-sm text-muted">No evaluation is linked to this trade. <Link href="/evaluate" className="text-accent hover:underline">Evaluate</Link></p>
       )}
-      <TradeForm action={updateTrade.bind(null, trade.id)} values={trade} submitLabel="更新" />
+      <TradeForm action={updateTrade.bind(null, trade.id)} values={trade} submitLabel="Update" />
     </div>
   );
 }

@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Entry Evaluator",
     short_name: "Evaluator",
-    description: "手法基準に基づくエントリー判定とトレードジャーナル",
+    description: "Strategy-based entry evaluation and trade journal",
     start_url: "/evaluate",
     display: "standalone",
     background_color: "#f7f7f5",

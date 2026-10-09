@@ -1,16 +1,16 @@
-// ジャーナルの派生値。Notion CSVの列定義に対応する。
+// Derived journal values. Correspond to the column definitions of the Notion CSV.
 
 export type Outcome = "WIN" | "BE" | "LOSS";
 
 export function quadrant(ruleCompliance: boolean, outcome: Outcome) {
   const win = outcome === "WIN";
-  if (ruleCompliance && win) return "① 遵守×勝";
-  if (ruleCompliance && !win) return "② 遵守×非勝";
-  if (!ruleCompliance && win) return "③ 違反×勝";
-  return "④ 違反×非勝";
+  if (ruleCompliance && win) return "① Compliant × Win";
+  if (ruleCompliance && !win) return "② Compliant × Non-win";
+  if (!ruleCompliance && win) return "③ Violation × Win";
+  return "④ Violation × Non-win";
 }
 
-/** JSTの時刻でセッションを推定(既存レポートの定義: Tokyo 〜17時 / NY 21時〜) */
+/** Infer the session from the JST time (definition from earlier reports: Tokyo until 17:00 / NY from 21:00) */
 export function inferMarket(date: Date): "Tokyo" | "London" | "NY" {
   const jstHour = (date.getUTCHours() + 9) % 24;
   if (jstHour >= 21 || jstHour < 5) return "NY";
@@ -18,7 +18,7 @@ export function inferMarket(date: Date): "Tokyo" | "London" | "NY" {
   return "London";
 }
 
-/** 週の開始(月曜 00:00 UTC)を返す */
+/** Return the start of the week (Monday 00:00 UTC) */
 export function weekStart(date: Date) {
   const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const day = d.getUTCDay(); // 0=Sun
@@ -45,12 +45,14 @@ export function fmtPct(v: number | null | undefined) {
 }
 
 export function fmtDateJst(d: Date) {
-  return new Intl.DateTimeFormat("ja-JP", {
+  return new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Tokyo",
-    month: "numeric",
+    month: "short",
     day: "numeric",
     weekday: "short",
     hour: "2-digit",
     minute: "2-digit",
+    hourCycle: "h23",
+    timeZoneName: "short",
   }).format(d);
 }

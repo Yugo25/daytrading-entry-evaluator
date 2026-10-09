@@ -7,13 +7,13 @@ datasource db {
   provider = "postgresql"
 }
 
-// 週単位のジャーナルページ(Notionの「8/23-8/28 +0.84」に相当)
+// Weekly journal page (equivalent to a Notion page like "8/23-8/28 +0.84")
 model Week {
   id        String   @id @default(cuid())
   startDate DateTime
   endDate   DateTime
-  theme     String?  // 週テーマ(例: 魚がかかるまではゆっくり待つ。待つのが仕事。)
-  review    String?  // 週次振り返り(自由記述 / AIレポート)
+  theme     String?  // weekly theme (e.g. Wait patiently until the fish bites. Waiting is the job.)
+  review    String?  // weekly review (free text / AI report)
   trades    Trade[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -21,15 +21,15 @@ model Week {
   @@unique([startDate])
 }
 
-// 判定に投入されたエントリー候補
+// An entry candidate submitted for evaluation
 model Setup {
   id          String   @id @default(cuid())
   strategyId  String   // "ema200" | "ema20" ...
   pair        String
-  direction   String?  // LONG | SHORT (未指定可 → AIが読み取る)
-  execTf      String   // 執行足 5m | 1h
-  notes       String?  // ユーザーメモ(自己分析・エントリー根拠)
-  numericData String?  // JSON: A/B/E/X 等の数値入力(任意)
+  direction   String?  // LONG | SHORT (optional → read by the AI)
+  execTf      String   // execution timeframe 5m | 1h
+  notes       String?  // user notes (self-analysis / entry rationale)
+  numericData String?  // JSON: numeric inputs such as A/B/E/X (optional)
   images      SetupImage[]
   evaluations Evaluation[]
   trade       Trade?
@@ -40,53 +40,53 @@ model SetupImage {
   id       String @id @default(cuid())
   setupId  String
   setup    Setup  @relation(fields: [setupId], references: [id], onDelete: Cascade)
-  role     String // EXEC(執行足) | HIGHER(上位足) | OTHER
-  path     String // ストレージ内の相対パス
+  role     String // EXEC (execution TF) | HIGHER (higher TF) | OTHER
+  path     String // relative path in storage
   mimeType String
   order    Int    @default(0)
 }
 
-// AIの判定結果(手法基準への適合)
+// AI evaluation result (compliance with the strategy criteria)
 model Evaluation {
   id              String   @id @default(cuid())
   setupId         String
   setup           Setup    @relation(fields: [setupId], references: [id], onDelete: Cascade)
   strategyId      String
-  strategyVersion String   // 判定時の手法ドキュメントのハッシュ(基準追跡用)
+  strategyVersion String   // hash of the strategy docs at evaluation time (to track criteria)
   model           String
   structured      String   // JSON: EvaluationOutput
-  rendered        String   // テンプレート準拠のMarkdown
+  rendered        String   // Markdown following the template
   overallScore    Int
   overallLabel    String
-  fewShotIds      String   // JSON: 参照したReviewのID配列
+  fewShotIds      String   // JSON: array of Review IDs used as examples
   inputTokens     Int?
   outputTokens    Int?
   review          Review?
   createdAt       DateTime @default(now())
 }
 
-// ユーザーによる判定の訂正 = 判定器の学習データ
+// The user's correction of an evaluation = training data for the evaluator
 model Review {
   id                String     @id @default(cuid())
   evaluationId      String     @unique
   evaluation        Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
-  agree             Boolean    // AI判定に同意するか
-  correctedScore    Int?       // 正しい総合点(不同意時)
-  correctedElements String?    // JSON: { S1: "○", K4: "×", ... } 訂正した要素のみ
-  comment           String     // なぜ違うのか / 何を見落としたか(最重要)
-  useAsExample      Boolean    @default(true) // 参照例として使うか
+  agree             Boolean    // whether the user agrees with the AI evaluation
+  correctedScore    Int?       // correct overall score (when disagreeing)
+  correctedElements String?    // JSON: { S1: "○", K4: "×", ... } corrected elements only
+  comment           String     // why it is wrong / what was missed (most important)
+  useAsExample      Boolean    @default(true) // whether to use as a calibration example
   createdAt         DateTime   @default(now())
 }
 
-// トレード記録(ジャーナル行)。判定と紐づいていても、いなくてもよい
+// Trade record (journal row). May or may not be linked to an evaluation
 model Trade {
   id               String    @id @default(cuid())
   weekId           String?
   week             Week?     @relation(fields: [weekId], references: [id])
   setupId          String?   @unique
   setup            Setup?    @relation(fields: [setupId], references: [id])
-  journalNo        Int?      // 週内の連番(1. EURAUD の「1」)
-  date             DateTime  // エントリー時刻
+  journalNo        Int?      // sequence number within the week (the "1" in "1. EURAUD")
+  date             DateTime  // entry time
   holdTime         String?   // 4h / 11h35m / 1d10h
   pair             String
   strategyId       String    // Type: ema200 / ema20
@@ -101,8 +101,8 @@ model Trade {
   ruleCompliance   Boolean   @default(true)
   violationContent String?
   violationMotive  String?
-  analysis         String?   // 考察
-  psychology       String?   // 心理
+  analysis         String?   // analysis
+  psychology       String?   // psychology
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 }

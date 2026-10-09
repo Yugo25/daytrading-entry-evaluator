@@ -11,7 +11,7 @@ export function EvaluationView({ strategy, out, corrected }: { strategy: Strateg
       </div>
 
       <section>
-        <h3 className="mb-2 text-sm font-semibold">観察</h3>
+        <h3 className="mb-2 text-sm font-semibold">Observations</h3>
         <table className="w-full text-sm">
           <tbody>
             {strategy.observations.map((o) => (
@@ -30,7 +30,7 @@ export function EvaluationView({ strategy, out, corrected }: { strategy: Strateg
           return (
             <section key={axis.key} className="card">
               <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-sm font-semibold">軸{i + 1}: {axis.label}</h3>
+                <h3 className="text-sm font-semibold">Axis {i + 1}: {axis.label}</h3>
                 {a && <ScoreBadge score={a.score} size="sm" />}
               </div>
               <table className="w-full text-sm">
@@ -42,7 +42,7 @@ export function EvaluationView({ strategy, out, corrected }: { strategy: Strateg
                       <tr key={el.key} className="border-t border-border">
                         <td className="w-28 py-1.5 pr-2 align-top">
                           <span className="font-mono text-xs text-muted">{el.key}</span> {el.label}
-                          {el.core && <span className="ml-1 text-[10px] text-muted">中核</span>}
+                          {el.core && <span className="ml-1 text-[10px] text-muted">core</span>}
                         </td>
                         <td className="w-12 py-1.5 text-center">
                           <Mark mark={e?.mark ?? "—"} />
@@ -61,7 +61,7 @@ export function EvaluationView({ strategy, out, corrected }: { strategy: Strateg
       </div>
 
       <section className="card">
-        <h3 className="mb-2 text-sm font-semibold">総合評価 — {out.overall.score}/5({out.overall.label})</h3>
+        <h3 className="mb-2 text-sm font-semibold">Overall Evaluation — {out.overall.score}/5 ({out.overall.label})</h3>
         <table className="w-full text-sm">
           <tbody>
             {strategy.overallRows.map((r) => [r.label, overallRow(out, r.key)]).map(([k, v]) => (
@@ -71,7 +71,7 @@ export function EvaluationView({ strategy, out, corrected }: { strategy: Strateg
         </table>
         {out.overall.score <= 3 && out.improvements.length > 0 && (
           <div className="mt-3">
-            <h4 className="mb-1 text-xs font-semibold">改善提案</h4>
+            <h4 className="mb-1 text-xs font-semibold">Improvements</h4>
             <table className="w-full text-sm">
               <tbody>
                 {out.improvements.map((im, i) => (

@@ -1,13 +1,17 @@
 import "dotenv/config";
-// NotionのTrading Journal週次CSVをインポートする。
-// usage: node scripts/import-notion-csv.ts <csv path> ["週テーマ"]
+// Import a weekly Trading Journal CSV exported from Notion.
+// usage: npm run import:csv -- <csv path> ["weekly theme"]
+// Accepts English column names, and the original Japanese Notion column names as aliases.
 import fs from "node:fs";
 import { PrismaClient } from "../src/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { weekStart, weekEnd } from "../src/lib/journal.js";
 
 const [, , csvPath, theme] = process.argv;
-if (!csvPath) { console.error("usage: node scripts/import-notion-csv.ts <csv> [theme]"); process.exit(1); }
+if (!csvPath) { console.error("usage: npm run import:csv -- <csv> [theme]"); process.exit(1); }
+
+/** Read a column by its English name, falling back to the Japanese Notion column name */
+const col = (r: Record<string, string>, en: string, ja: string) => r[en] ?? r[ja] ?? "";
 
 function parseCsv(text: string): Record<string, string>[] {
   const rows: string[][] = [];
@@ -52,8 +56,8 @@ for (const r of records) {
       execTf: r.TF || "5m", holdTime: r.Time || null,
       lineGrade: r.Line || null, aoiGrade: r.AOI || null, outcome,
       riskPct: num(r.Risk), rrr: num(r.RRR), resultPct: num(r.Result), market: r.Market || null,
-      ruleCompliance: r["ルール遵守"] !== "No",
-      violationContent: r["違反内容"] || null, violationMotive: r["違反動機"] || null,
+      ruleCompliance: col(r, "Rule compliance", "ルール遵守") !== "No",
+      violationContent: col(r, "Violation", "違反内容") || null, violationMotive: col(r, "Violation motive", "違反動機") || null,
     },
   });
   imported++;

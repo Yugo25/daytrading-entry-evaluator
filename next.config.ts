@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    // Server Action の既定は 1MB。スマホのスクリーンショット(1〜3MB)を複数枚送れるよう拡張する。
-    // Vercel のリクエスト上限が 4.5MB なので、クライアント側でも送信前に画像を縮小している(EvaluateForm)。
+    // The Server Action default is 1MB. Raised so several phone screenshots (1–3MB each) can be sent.
+    // Vercel's request limit is 4.5MB, so images are also shrunk on the client before sending (EvaluateForm).
     serverActions: { bodySizeLimit: "4mb" },
   },
 };

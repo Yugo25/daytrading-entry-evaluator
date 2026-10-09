@@ -8,7 +8,7 @@ export async function submitReview(formData: FormData) {
   const evaluationId = String(formData.get("evaluationId"));
   const agree = formData.get("agree") === "yes";
   const comment = String(formData.get("comment") ?? "").trim();
-  if (!comment) throw new Error("コメント(なぜ同意/不同意か)は必須です。これが学習データになります");
+  if (!comment) throw new Error("A comment (why you agree/disagree) is required. It becomes the training data");
   const correctedScoreRaw = String(formData.get("correctedScore") ?? "");
   const correctedScore = !agree && correctedScoreRaw ? Number(correctedScoreRaw) : null;
 
@@ -27,7 +27,7 @@ export async function submitReview(formData: FormData) {
 
 export async function deleteSetup(setupId: string) {
   const setup = await prisma.setup.findUniqueOrThrow({ where: { id: setupId }, include: { images: true } });
-  await prisma.setup.delete({ where: { id: setupId } }); // Evaluation / Review は cascade、Trade は setupId が null になる
+  await prisma.setup.delete({ where: { id: setupId } }); // Evaluation / Review cascade; Trade.setupId becomes null
   await Promise.all(setup.images.map((img) => deleteFile(img.path).catch(() => undefined)));
   revalidatePath("/setups");
   revalidatePath("/journal");

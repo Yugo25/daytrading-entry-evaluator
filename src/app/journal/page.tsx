@@ -35,19 +35,19 @@ export default async function JournalPage({ searchParams }: PageProps<"/journal"
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Trading Journal</h1>
-        <Link href="/journal/new" className="btn-primary">+ トレード記録</Link>
+        <Link href="/journal/new" className="btn-primary">+ Log trade</Link>
       </div>
 
       <form className="card flex flex-wrap items-end gap-3 text-sm">
-        <div><label className="label">手法</label><select className="input" name="strategy" defaultValue={strategyId}><option value="">すべて</option>{strategies.map((s) => <option key={s.id} value={s.id}>{s.shortName}</option>)}</select></div>
-        <div><label className="label">ペア</label><input className="input font-mono uppercase" name="pair" defaultValue={pair} placeholder="XAUUSD" /></div>
-        <div><label className="label">結果</label><select className="input" name="outcome" defaultValue={outcome}><option value="">すべて</option><option value="WIN">Win</option><option value="BE">BE</option><option value="LOSS">Loss</option></select></div>
-        <div><label className="label">遵守</label><select className="input" name="compliance" defaultValue={compliance}><option value="">すべて</option><option value="yes">Yes</option><option value="no">No</option></select></div>
-        <button className="btn-ghost">絞り込む</button>
-        {(strategyId || pair || outcome || compliance) && <Link href="/journal" className="text-xs text-muted">クリア</Link>}
+        <div><label className="label">Strategy</label><select className="input" name="strategy" defaultValue={strategyId}><option value="">All</option>{strategies.map((s) => <option key={s.id} value={s.id}>{s.shortName}</option>)}</select></div>
+        <div><label className="label">Pair</label><input className="input font-mono uppercase" name="pair" defaultValue={pair} placeholder="XAUUSD" /></div>
+        <div><label className="label">Outcome</label><select className="input" name="outcome" defaultValue={outcome}><option value="">All</option><option value="WIN">Win</option><option value="BE">BE</option><option value="LOSS">Loss</option></select></div>
+        <div><label className="label">Compliance</label><select className="input" name="compliance" defaultValue={compliance}><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+        <button className="btn-ghost">Filter</button>
+        {(strategyId || pair || outcome || compliance) && <Link href="/journal" className="text-xs text-muted">Clear</Link>}
       </form>
 
-      {filtered.length === 0 && <p className="card text-sm text-muted">記録がありません。判定ページから、または「+ トレード記録」から追加してください。</p>}
+      {filtered.length === 0 && <p className="card text-sm text-muted">No trades yet. Add one from an evaluation page or with “+ Log trade”.</p>}
 
       {filtered.map((w) => {
         const pnl = w.trades.reduce((s, t) => s + (t.resultPct ?? 0), 0);
@@ -58,11 +58,11 @@ export default async function JournalPage({ searchParams }: PageProps<"/journal"
               <div>
                 <h2 className="font-semibold">{fmtWeekRange(w.startDate, w.endDate)} <span className={pnl >= 0 ? "text-emerald-600" : "text-red-600"}>{fmtPct(pnl)}</span></h2>
                 <details>
-                  <summary className="cursor-pointer text-sm text-muted">{w.theme ?? "週テーマを設定"}</summary>
+                  <summary className="cursor-pointer text-sm text-muted">{w.theme ?? "Set weekly theme"}</summary>
                   <form action={updateWeek.bind(null, w.id)} className="mt-2 grid max-w-xl gap-2">
-                    <input className="input" name="theme" placeholder="週テーマ(例: 魚がかかるまではゆっくり待つ。待つのが仕事。)" defaultValue={w.theme ?? ""} />
-                    <textarea className="input" name="review" rows={3} placeholder="週次振り返り" defaultValue={w.review ?? ""} />
-                    <button className="btn-ghost w-fit">保存</button>
+                    <input className="input" name="theme" placeholder="Weekly theme (e.g. Wait patiently until the fish bites. Waiting is the job.)" defaultValue={w.theme ?? ""} />
+                    <textarea className="input" name="review" rows={3} placeholder="Weekly review" defaultValue={w.review ?? ""} />
+                    <button className="btn-ghost w-fit">Save</button>
                   </form>
                 </details>
               </div>
@@ -71,7 +71,7 @@ export default async function JournalPage({ searchParams }: PageProps<"/journal"
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px] text-sm">
                 <thead className="text-left text-xs text-muted">
-                  <tr>{["Journal", "Date", "Time", "Type", "TF", "Line", "AOI", "結果", "Risk", "RRR", "Result", "Market", "遵守", "4象限", "違反内容", "AI判定"].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr>
+                  <tr>{["Journal", "Date", "Time", "Type", "TF", "Line", "AOI", "Outcome", "Risk", "RRR", "Result", "Market", "Compliant", "Quadrant", "Violation", "AI Score"].map((h) => <th key={h} className="px-3 py-2 font-medium">{h}</th>)}</tr>
                 </thead>
                 <tbody>
                   {w.trades.map((t) => {

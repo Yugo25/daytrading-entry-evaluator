@@ -8,9 +8,9 @@ export default async function NewTradePage({ searchParams }: PageProps<"/journal
   const setup = setupId ? await prisma.setup.findUnique({ where: { id: setupId } }) : null;
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">トレード記録を追加</h1>
-      {setup && <p className="text-sm text-muted">判定 {setup.pair} {setup.execTf} に紐づけます</p>}
-      <TradeForm action={createTrade} setupId={setup?.id} values={setup ? { pair: setup.pair, strategyId: setup.strategyId, execTf: setup.execTf, date: new Date() } : { date: new Date() }} submitLabel="記録する" />
+      <h1 className="text-xl font-semibold">Log a Trade</h1>
+      {setup && <p className="text-sm text-muted">Linked to evaluation {setup.pair} {setup.execTf}</p>}
+      <TradeForm action={createTrade} setupId={setup?.id} values={setup ? { pair: setup.pair, strategyId: setup.strategyId, execTf: setup.execTf, date: new Date() } : { date: new Date() }} submitLabel="Save trade" />
     </div>
   );
 }

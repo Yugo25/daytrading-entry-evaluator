@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "Entry Evaluator",
-  description: "手法基準に基づくエントリー判定とトレードジャーナル",
+  description: "Strategy-based entry evaluation and trade journal",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Evaluator" },
 };
@@ -24,16 +24,16 @@ export const viewport: Viewport = {
 };
 
 const nav = [
-  { href: "/evaluate", label: "判定" },
-  { href: "/setups", label: "判定一覧" },
-  { href: "/journal", label: "ジャーナル" },
-  { href: "/stats", label: "統計" },
-  { href: "/strategies", label: "手法" },
+  { href: "/evaluate", label: "Evaluate" },
+  { href: "/setups", label: "Setups" },
+  { href: "/journal", label: "Journal" },
+  { href: "/stats", label: "Stats" },
+  { href: "/strategies", label: "Strategies" },
 ];
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ja" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <header className="sticky top-0 z-10 border-b border-border bg-card/95 backdrop-blur">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-1 px-4 py-2.5">

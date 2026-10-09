@@ -11,7 +11,7 @@ async function storeImages(setupId: string, files: File[], role: string, startOr
   let order = startOrder;
   for (const f of files) {
     if (!f.size) continue;
-    if (!allowed.has(f.type)) throw new Error(`未対応の画像形式: ${f.type}`);
+    if (!allowed.has(f.type)) throw new Error(`Unsupported image format: ${f.type}`);
     const ext = f.type.split("/")[1].replace("jpeg", "jpg");
     const rel = `${setupId}/${role.toLowerCase()}-${order}.${ext}`;
     await saveFile(rel, Buffer.from(await f.arrayBuffer()), f.type);
@@ -20,8 +20,8 @@ async function storeImages(setupId: string, files: File[], role: string, startOr
   return order;
 }
 
-// 本番では Server Action 内の throw は React error #441 に丸められ原因が見えないため、
-// 入力・保存段階のエラーは戻り値で返してフォームに表示する。判定段階のエラーは詳細ページに引き継ぐ。
+// In production, a throw inside a Server Action is collapsed into React error #441 and the cause is hidden,
+// so errors in the input/save stage are returned as values and shown in the form. Evaluation-stage errors are carried over to the detail page.
 export async function createAndEvaluate(formData: FormData): Promise<{ error: string } | void> {
   let setupId: string;
   try {
@@ -38,20 +38,20 @@ async function createSetup(formData: FormData) {
   const strategyId = String(formData.get("strategyId"));
   const strategy = getStrategy(strategyId);
   const execTf = String(formData.get("execTf"));
-  if (!strategy.execTimeframes.includes(execTf)) throw new Error("執行足が不正です");
+  if (!strategy.execTimeframes.includes(execTf)) throw new Error("Invalid execution timeframe");
   const pair = String(formData.get("pair") ?? "").trim().toUpperCase();
-  if (!pair) throw new Error("通貨ペアは必須です");
+  if (!pair) throw new Error("Pair is required");
   const direction = String(formData.get("direction") ?? "") || null;
   const notes = String(formData.get("notes") ?? "").trim() || null;
   const numericRaw = String(formData.get("numericData") ?? "").trim();
   let numericData: string | null = null;
   if (numericRaw) {
-    try { numericData = JSON.stringify(JSON.parse(numericRaw)); } catch { throw new Error("数値データはJSON形式で入力してください"); }
+    try { numericData = JSON.stringify(JSON.parse(numericRaw)); } catch { throw new Error("Numeric data must be valid JSON"); }
   }
 
   const execImages = formData.getAll("execImages").filter((f): f is File => f instanceof File && f.size > 0);
   const higherImages = formData.getAll("higherImages").filter((f): f is File => f instanceof File && f.size > 0);
-  if (!execImages.length && !numericData) throw new Error("執行足チャート画像か数値データのどちらかは必要です");
+  if (!execImages.length && !numericData) throw new Error("Either an execution-TF chart image or numeric data is required");
 
   const setup = await prisma.setup.create({ data: { strategyId, pair, direction, execTf, notes, numericData } });
   const n = await storeImages(setup.id, execImages, "EXEC", 0);
@@ -63,7 +63,7 @@ export async function reEvaluate(setupId: string) {
   await runEvaluation(setupId);
 }
 
-// 画像・入力は保存済みなので、判定に失敗しても詳細ページで「再判定」できるようにする
+// Images and inputs are already saved, so even if evaluation fails it can be re-run from the detail page
 async function runEvaluation(setupId: string) {
   let error: string | null = null;
   try {

@@ -1,7 +1,7 @@
-// ブラウザ側で画像を送信前に縮小・再エンコードする。
-// 目的: (1) スマホのスクショ(1〜3MB PNG)が Server Action / Vercel の本文上限を超えるのを防ぐ
-//       (2) iPhone の HEIC など server 側で扱えない形式を JPEG に揃える(Safari は img で HEIC をデコードできる)
-const MAX_EDGE = 2000; // チャートの細部(ローソク・ライン)が読める上限
+// Shrink and re-encode images in the browser before sending.
+// Purpose: (1) keep phone screenshots (1–3MB PNG) from exceeding the Server Action / Vercel body limit
+//          (2) normalize formats the server can't handle, such as iPhone HEIC, to JPEG (Safari can decode HEIC in <img>)
+const MAX_EDGE = 2000; // the upper bound at which chart details (candles, lines) are still readable
 const QUALITY = 0.9;
 
 export async function shrinkImage(file: File): Promise<File> {
@@ -17,7 +17,7 @@ export async function shrinkImage(file: File): Promise<File> {
   ctx.drawImage(bitmap, 0, 0, w, h);
   const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, "image/jpeg", QUALITY));
   if (!blob) return file;
-  // 縮小しても小さくならなかった(元が小さいPNG等)場合は元ファイルのまま送る
+  // If shrinking didn't make it smaller (e.g. the original was a small PNG), send the original file
   if (scale === 1 && blob.size >= file.size && file.type !== "image/heic" && file.type !== "image/heif" && file.type !== "") return file;
   return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
 }
@@ -27,7 +27,7 @@ async function loadBitmap(file: File): Promise<ImageBitmap | HTMLImageElement> {
     try {
       return await createImageBitmap(file);
     } catch {
-      /* HEIC 等は createImageBitmap 非対応のことがあるので <img> にフォールバック */
+      /* HEIC etc. may not be supported by createImageBitmap, so fall back to <img> */
     }
   }
   const url = URL.createObjectURL(file);
@@ -35,7 +35,7 @@ async function loadBitmap(file: File): Promise<ImageBitmap | HTMLImageElement> {
     return await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`画像を読み込めませんでした: ${file.name}`));
+      img.onerror = () => reject(new Error(`Could not load image: ${file.name}`));
       img.src = url;
     });
   } finally {
@@ -43,7 +43,7 @@ async function loadBitmap(file: File): Promise<ImageBitmap | HTMLImageElement> {
   }
 }
 
-/** FormData 内の指定フィールドの画像を全て縮小版に置き換える */
+/** Replace every image in the given FormData field with a shrunk version */
 export async function shrinkFormImages(fd: FormData, field: string) {
   const files = fd.getAll(field).filter((f): f is File => f instanceof File && f.size > 0);
   fd.delete(field);

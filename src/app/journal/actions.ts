@@ -21,14 +21,14 @@ async function ensureWeek(date: Date) {
 }
 
 function parseTrade(formData: FormData) {
-  // datetime-local はタイムゾーン無し → JST として解釈
+  // datetime-local has no time zone → interpret as JST
   const dateStr = String(formData.get("date") ?? "");
-  if (!dateStr) throw new Error("日時は必須です");
+  if (!dateStr) throw new Error("Date and time are required");
   const date = new Date(`${dateStr}:00+09:00`);
   const outcome = String(formData.get("outcome")) as Outcome;
-  if (!["WIN", "BE", "LOSS"].includes(outcome)) throw new Error("結果が不正です");
+  if (!["WIN", "BE", "LOSS"].includes(outcome)) throw new Error("Invalid outcome");
   const pair = String(formData.get("pair") ?? "").trim().toUpperCase();
-  if (!pair) throw new Error("通貨ペアは必須です");
+  if (!pair) throw new Error("Pair is required");
   return {
     date,
     pair,
