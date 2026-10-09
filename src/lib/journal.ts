@@ -53,6 +53,5 @@ export function fmtDateJst(d: Date) {
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
-    timeZoneName: "short",
-  }).format(d);
+  }).format(d) + " JST";
 }
