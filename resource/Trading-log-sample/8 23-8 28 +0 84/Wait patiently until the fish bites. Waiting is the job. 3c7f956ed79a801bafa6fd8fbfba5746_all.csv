@@ -1,0 +1,6 @@
+﻿Journal,Quadrant,AOI,BE,Date,Day,Line,Loss,Market,Pair,RRR,Result,Risk,TF,Time,Type,Win,Rule compliance,Violation,Violation motive
+1. EURAUD,② Compliant × Non-win,B,No,"August 24, 2026 22:50 (EDT)",Monday,None,Yes,Tokyo,EURAUD,1.5,-0.49%,0.5%,5m,4h,20EMA,No,Yes,,
+2. GBPJPY,② Compliant × Non-win,A,Yes,"August 25, 2026 9:10 (EDT)",Tuesday,B,No,NY,GBPJPY,1.2,-0.18%,0.5%,5m,11h35m,200EMA,No,Yes,,
+3. GBPAUD,① Compliant × Win,S,No,"August 25, 2026 11:00 (EDT)",Tuesday,S,No,NY,GBPAUD,2.1,1.07%,0.5%,1h,1d10h,200EMA,Yes,Yes,,
+4. BTCUSD,① Compliant × Win,A,No,"August 27, 2026 10:10 (EDT)",Thursday,B,No,NY,BTCUSD,1.7,0.94%,0.5%,5m,1h,200EMA,Yes,Yes,,
+5. USDCHF,④ Violation × Non-win,B,No,"August 28, 2026 9:10 (EDT)",Friday,B,Yes,NY,USDCHF,1.2,-0.5%,0.5%,5m,50m,200EMA,No,No,Entry without enough basis,Overconfidence

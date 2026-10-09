@@ -1,6 +1,0 @@
-﻿Journal,Date,Day,Time,Pair,Type,TF,Line,AOI,Win,BE,Loss,Risk,RRR,Result,Market,ルール遵守,4象限,違反内容,違反動機
-1. EURAUD,"August 24, 2026 22:50 (EDT)",Monday,4h,EURAUD,20EMA,5m,None,B,No,No,Yes,0.5%,1.5,-0.49%,Tokyo,Yes,② 遵守×非勝,,
-2. GBPJPY,"August 25, 2026 9:10 (EDT)",Tuesday,11h35m,GBPJPY,200EMA,5m,B,A,No,Yes,No,0.5%,1.2,-0.18%,NY,Yes,② 遵守×非勝,,
-3. GBPAUD,"August 25, 2026 11:00 (EDT)",Tuesday,1d10h,GBPAUD,200EMA,1h,S,S,Yes,No,No,0.5%,2.1,1.07%,NY,Yes,① 遵守×勝,,
-4. BTCUSD,"August 27, 2026 10:10 (EDT)",Thursday,1h,BTCUSD,200EMA,5m,B,A,Yes,No,No,0.5%,1.7,0.94%,NY,Yes,① 遵守×勝,,
-5. USDCHF,"August 28, 2026 9:10 (EDT)",Friday,50m,USDCHF,200EMA,5m,B,B,No,No,Yes,0.5%,1.2,-0.5%,NY,No,④ 違反×非勝,根拠不足エントリー,自信過剰
