@@ -79,7 +79,7 @@ export default async function JournalPage({ searchParams }: PageProps<"/journal"
                     return (
                       <tr key={t.id} className="border-t border-border hover:bg-border/20">
                         <td className="px-3 py-2 font-medium"><Link href={`/trades/${t.id}`} className="hover:underline">{t.journalNo}. {t.pair}</Link></td>
-                        <td className="px-3 py-2 whitespace-nowrap">{new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", month: "numeric", day: "numeric", weekday: "short", hour: "2-digit", minute: "2-digit" }).format(t.date)}</td>
+                        <td className="px-3 py-2 whitespace-nowrap">{new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Tokyo", month: "numeric", day: "numeric", weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(t.date)}</td>
                         <td className="px-3 py-2">{t.holdTime ?? "—"}</td>
                         <td className="px-3 py-2">{strategyName(t.strategyId)}</td>
                         <td className="px-3 py-2">{t.execTf}</td>
