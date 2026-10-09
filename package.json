@@ -1,6 +1,8 @@
 {
   "name": "daytrading-entry-evaluator",
   "version": "0.1.0",
+  "description": "AI-powered day-trading entry evaluator that grades chart setups against a written strategy, with a trade journal and stats",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
