@@ -1,59 +1,59 @@
-# 模範画像の分析記録(XAUUSD 5分足)
+# Analysis Notes on the Model Images (XAUUSD 5m)
 
-ユーザー提供の模範エントリー画像9枚から抽出した理想形の特徴。緑直線 = 切り上げ/下げライン、赤緑ボックスの境目 = 建値、赤側 = SL、緑側 = TP。
+Characteristics of the ideal form extracted from 9 model entry images provided by the user. Green straight line = ascending/descending line; boundary of the red/green box = entry price; red side = SL; green side = TP.
 
-## 理想形に共通する特徴
+## Characteristics common to the ideal form
 
-### 軸1関連(スイング明確性: S1〜S4)
+### Related to Axis 1 (swing clarity: S1–S4)
 
-1. **調整波が2〜3波の明確な波動を持つ**(S1)。ローソクが密集して横ばう区間ではなく、上げ→押し→上げ(またはその逆)のリズムが視認できる。
-2. **ラインは反応済みピボット2〜3点を結ぶ**(S2)。模範例の多くで、ラインへの3点目前後のタッチ&反発が確認でき、その直後のブレイクがエントリーになっている。
-3. **200EMA到達点で反転構造が完成している**(S3)。ダブルトップ/ボトムが最頻出(例: 下方向エントリーで「ダブルトップが出たので」と明示された例あり)。2つ目の山/谷が200EMAに抑えられる形が典型。
-4. **ラインの一意性が高い**(S4)。模範例ではスイングが立っているため「ここしか引けない」形になっており、引き直しの余地がほぼない。
+1. **The corrective wave has 2–3 clear waves** (S1). Not a section where candles cluster and move sideways; a rhythm of up → pullback → up (or the reverse) is visible.
+2. **The line connects 2–3 pivots that have reacted** (S2). In many model examples, a touch & bounce around the 3rd point on the line can be seen, and the break right after it is the entry.
+3. **A reversal structure is complete at the point where the 200EMA is reached** (S3). Double tops/bottoms are the most frequent (e.g. there is an example of a downward entry explicitly described as "because a double top appeared"). The typical shape is the second peak/trough being held down by the 200EMA.
+4. **The line is highly unique** (S4). In the model examples, swings stand out, so the shape is "this is the only place it can be drawn," leaving almost no room to redraw.
 
-### 軸2関連(角度・規模: K1〜K4)
+### Related to Axis 2 (angle and scale: K1–K4)
 
-5. **ラインの起点は常に調整波の起点(推進波の終点ピボット)にある**(K1)。模範例のラインはすべて調整全体を覆っており、調整の途中や末端のサブ波動から引かれたラインは存在しない。急角度に見える低品質ラインは例外なく、調整末端の加速した一脚だけを捉えたものだった。
-6. **ラインの傾きは直前の推進波の傾きより明確に緩やか**(K2)。推進は速く、調整は遅い。調整側のラインが推進並みの傾きを持つ場合、それは調整ではなく逆方向の推進(トレンド転換)か、規模の小さすぎるサブ波動のラインである。
-7. **調整は時間をかけて発達している**(K3)。**調整波の形成時間は推進波と同等〜それ以上が普通であり、長いことは減点要因ではない**。実例: 約5〜6時間の下落推進に対し約6時間の戻り調整(大勝ちショート例)、約2時間の急落推進に対し半日近い戻り調整(ダブルトップ→ショート例)。時間をかけた調整ほどスイングが立ち、ラインの信頼度が上がる。逆に数本のローソクしか含まない極小ラインは規模不足で無効。
-8. **ブレイク地点が200EMAタッチ直後の近傍**(K4)。ラインブレイクと200EMAからの反発が同じゾーンで重なることで、SL(調整波の最終高安値)が近く、RRRが1:1〜1:3に収まる。**定量化(2026/6 追加)**: ブレイク位置は「調整レンジ幅Rで正規化した戻し率 r=(X−B)/R(ロング)」で測る。模範例の実測は **模範ロング r≈0.29 / 模範ショート r≈0.33** と、いずれも調整レンジ**下1/3**でのブレイク。これがK4=○のアンカー。r>0.50(調整の上半分でのブレイク)はEMAから乖離した「戻り買い/売り」でK4=×。判定式の詳細はSKILL.mdの「K4(ブレイク位置)の客観判定」。
+5. **The origin of the line is always at the origin of the corrective wave (the end pivot of the impulse wave)** (K1). Every line in the model examples covers the whole correction; there are no lines drawn from a sub-wave in the middle or at the tail of the correction. Low-quality lines that look steep were, without exception, ones that captured only the accelerating final leg at the tail of the correction.
+6. **The line's slope is clearly gentler than the slope of the preceding impulse wave** (K2). Impulses are fast; corrections are slow. If the corrective line is as steep as the impulse, it is not a correction but an impulse in the opposite direction (a trend reversal), or a line on a sub-wave whose scale is too small.
+7. **The correction develops over time** (K3). **It is normal for the corrective wave to take as long as or longer than the impulse wave to form, and length is not a deduction.** Real examples: a pullback correction of about 6 hours against a falling impulse of about 5–6 hours (big winning short), and a pullback correction of nearly half a day against a sharp falling impulse of about 2 hours (double top → short). The more time a correction takes, the more swings stand out and the more reliable the line becomes. Conversely, a tiny line containing only a few candles is invalid for lack of scale.
+8. **The break point is near, and right after, the 200EMA touch** (K4). Because the line break and the bounce from the 200EMA overlap in the same zone, the SL (the final high/low of the corrective wave) is close and the RRR stays within 1:1–1:3. **Quantification (added 2026/6)**: the break location is measured by "the retracement ratio normalized by the correction range width R: r=(X−B)/R (long)." Measured on the model examples: **model long r≈0.29 / model short r≈0.33**, both breaks in the **lower 1/3** of the correction range. This is the anchor for K4=○. r>0.50 (a break in the upper half of the correction) is "buying/selling the pullback" away from the EMA, and K4=×. For the details of the formula, see "Objective judgment of K4 (break location)" in SKILL.md.
 
-### 旧基準の廃止記録
+### Record of retired criteria
 
-- 「調整の時間幅が推進波の1/3〜1倍が適正」という旧基準は**誤りとして廃止**(2026/6)。模範例の実測で調整≧推進のケースが多数であり、調整に時間がかかるのはむしろ本物の調整の特徴。時間比では判定しない。
-- 「絶対角度30〜45°が適正」という表現も廃止。角度は画像の縦横比に依存するため、判定は常に推進波との相対傾斜(K2)で行う。
+- The old criterion "a correction lasting 1/3 to 1× the impulse wave is appropriate" was **retired as incorrect** (2026/6). Measurements of the model examples showed many cases of correction ≥ impulse, and a correction taking time is, if anything, a hallmark of a genuine correction. Do not judge by time ratio.
+- The expression "an absolute angle of 30–45° is appropriate" was also retired. Angle depends on the image's aspect ratio, so always judge by the slope relative to the impulse wave (K2).
 
-## 個別画像の要点
+## Key points of individual images
 
-- **下降トレンド・大勝ち例**: 200EMAが明確に下向き。約5〜6時間の下落推進に対し、約6時間かけた戻り調整。スイング安値2〜3点を結ぶ、推進よりはるかに緩やかな切り上げライン。起点は調整の開始点。200EMA到達と同時のブレイクで大きく崩落。全要素○の基準例。
-- **上昇再開・ロング例**: 上向き200EMAへの押しが切り下げの波動を形成。戻り高値2〜3点を結ぶ切り下げラインを、200EMAタッチ直後に上抜け。起点一致・相対傾斜とも良好な基準例。
-- **ダブルトップ→ショート例**: 急峻な下落推進(約2時間)の後、半日近くかけた戻りが200EMA手前でダブルトップを形成。調整時間が推進の数倍でも理想形となる代表例。スイング安値を結ぶ切り上げラインのブレイクでエントリー。
-- **二連続エントリー例**: 同一チャート内で切り下げブレイク→ロング、切り上げブレイク→ショートの両方が成立。どちらもラインが調整の起点から引かれ、スイングを結べている。
-- **急角度・揉み合い気味の例**: 調整末端のサブ波動だけを捉えた急なライン、200EMA付近でローソクの重なりが多い例も含まれる。これらはブレイク後にいったん逆行する、または値幅が伸びにくい傾向が画像上でも観察され、K1×/K2×が優位性を下げるという主張と整合する。2点以下の判定の参考にする。
-- **フラット200EMA・レンジ例(2025年4月末)**: 200EMAがほぼ横ばいで、価格がEMA周辺で上下する局面。ラインは引けるがスイングが浅く、典型的なビルドアップ局面。2〜5月の負けパターンの代表として、軸1=1〜2の校正例にする。**「200EMA反応の質」=張り付き(×)の基準例**: フラットEMAを終値が何度も跨いで往復(クロス回数 c≥3)、各足が収縮し、EMAから振幅を持って離脱しない(離脱幅 a が小さい)。特則トリガー2(EMA張り付き)が発動して総合上限2。
+- **Downtrend, big win**: The 200EMA clearly slopes down. A pullback correction taking about 6 hours against a falling impulse of about 5–6 hours. An ascending line connecting 2–3 swing lows, far gentler than the impulse. The origin is the start of the correction. Broke at the same time as reaching the 200EMA and collapsed sharply. The reference example with all elements ○.
+- **Uptrend resumption, long**: The pullback to the upward-sloping 200EMA forms a descending wave pattern. Broke above the descending line connecting 2–3 pullback highs right after the 200EMA touch. A reference example with good origin match and relative slope.
+- **Double top → short**: After a steep falling impulse (about 2 hours), a pullback lasting nearly half a day formed a double top just below the 200EMA. The representative example of an ideal form even though the correction took several times as long as the impulse. Entry on the break of the ascending line connecting the swing lows.
+- **Two consecutive entries**: In the same chart, both a descending-line break → long and an ascending-line break → short were valid. In both, the line is drawn from the origin of the correction and connects the swings.
+- **Steep, choppy-ish examples**: Includes steep lines capturing only the sub-wave at the tail of the correction, and examples with many overlapping candles near the 200EMA. In the images too, these tend to move against the position for a while after the break, or fail to extend, which is consistent with the claim that K1×/K2× reduce the edge. Use them as references for judgments of 2 points or lower.
+- **Flat 200EMA, range (end of April 2025)**: A phase where the 200EMA is almost flat and price moves up and down around the EMA. A line can be drawn but the swings are shallow — a typical build-up phase. As the representative of the February–May losing pattern, use it as a calibration example for Axis 1 = 1–2. **The reference example for "quality of the 200EMA reaction" = clinging (×)**: closes oscillate back and forth across the flat EMA many times (cross count c≥3), each candle contracts, and price does not leave the EMA with amplitude (departure size a is small). Special-rule trigger 2 (clinging to the EMA) is invoked and the overall is capped at 2.
 
-## 200EMA反応の質(R)の校正アンカー
+## Calibration anchors for the quality of the 200EMA reaction (R)
 
-- **反発(○)の基準例**: 上昇再開ロング例=下向きでなく上向きの200EMAへ押し→タッチ後に拒否足を伴い上方へ振幅を持って離脱(c≤1、a≥0.30)、その後ダブルボトム的に推進再開。ダブルトップ→ショート例=200EMA手前で2回触れて押し返され(片側維持・クロスせず)、決定的に下落離脱。いずれも「触れて跳ねて離れる」。
-- **張り付き(×)の基準例**: 2025年4月末フラット例(上記)。EMAを舐めて往復・収縮。
-- **区別の本質**: 反発は「EMAを片側から尊重して跳ね返る(振幅・拒否足・ダブル構造)」、張り付きは「EMAを挟んで往復しボラ収縮(EMAが実体を貫く)」。EURNZD(2026/6/17)は上昇EMAで振幅ある反発=R○で、特則は非該当。弱点はK4(遅いブレイク)であって反応の質ではなかった、と切り分けた実例。
+- **Reference examples for bounce (○)**: Uptrend resumption long = a pullback to an upward (not downward) sloping 200EMA → after the touch, leaves upward with amplitude accompanied by a rejection candle (c≤1, a≥0.30), then the impulse resumes in a double-bottom-like way. Double top → short = touched twice just below the 200EMA and was pushed back (held on one side, no cross), then decisively left downward. Both are "touch, spring, and leave."
+- **Reference example for clinging (×)**: The flat example at the end of April 2025 (above). Licking the EMA, oscillating back and forth, contracting.
+- **The essence of the distinction**: A bounce "respects the EMA from one side and springs back (amplitude, rejection candle, double structure)"; clinging "oscillates back and forth across the EMA with volatility contraction (the EMA pierces the candle bodies)." EURNZD (2026/6/17) was a bounce with amplitude off a rising EMA = R○, and the special rule did not apply. A real example where the weakness was separated out as K4 (late break), not the reaction quality.
 
-## 採点の校正アンカー
+## Calibration anchors for scoring
 
-- 「調整の起点から引かれ、複数の反応ピボットを結び、反転構造を伴い、推進より明確に緩やかな傾斜で、200EMA近傍でブレイクする」ラインが全要素○ = 5/5。
-- 要素1つが△に落ちるごとに1点下げる感覚(換算表に従う)。
-- 中核要素の単独×は軸2: ジリ・レンジでスイングが立たない(S1×)、ラインが調整の末端サブ波動のみ(K1×)、推進並みの急傾斜(K2×)。**非中核(S3/S4・K3/K4)の単独×は軸3に留める**(質を上げる要素の欠落であって土台の崩壊ではないため)。×が2つ以上は軸1。
-- 実評価例(USDCAD 5m ロング、2026/6/8): S1○ S2△(3点目未確認) S3△(2番底が切り下がりEMA一時下抜け)→と評価したが旧方式で軸1=4。新換算表では○2△2=3になりうる境界例。ユーザーの感覚では4が妥当だったため、△の認定は「明確な欠陥」に限り、軽微な不完全さは○寄りに扱う。
-- 実評価例(EURNZD 5m ロング、2026/6/17 / K4校正例): 当初K4=○で総合3としたが、ブレイク位置を実測すると A=1.9930 / B=1.9905 / X=1.99194 / R=0.0025 で **r≈0.58(調整の上半分)**、g≈0.54。200EMAタッチ(B=1.9905)から約14pips戻した位置でのブレイクであり「タッチ近傍」ではない → 新K4システムで **K4=×**。K4は非中核のため新換算表では軸2=3に留まり、ゲートで総合は**3(要注意)**のまま(=判定ラベルは当初と同じだが、内訳がK4○→×・軸2:5→3に訂正され、誤りの所在が明示された状態)。RRRも約1:1.2と1:1側に圧縮されており遅いエントリーを裏づけ。「同じ調整構造内のブレイク」を「近傍」と誤認した典型例として保存。
+- A line that "is drawn from the origin of the correction, connects multiple reacting pivots, comes with a reversal structure, has a slope clearly gentler than the impulse, and breaks near the 200EMA" has all elements ○ = 5/5.
+- Each element that drops to △ lowers the score by about 1 point (follow the conversion table).
+- A single × on a core element makes the axis 2: grind/range with no swings (S1×), a line on only the tail sub-wave of the correction (K1×), a slope as steep as the impulse (K2×). **A single × on a non-core element (S3/S4, K3/K4) keeps the axis at 3** (because it is the absence of an element that raises quality, not the collapse of the foundation). Two or more × makes the axis 1.
+- Real evaluation example (USDCAD 5m long, 2026/6/8): Evaluated as S1○ S2△ (3rd point not confirmed) S3△ (the second bottom was lower and briefly broke below the EMA) → Axis 1 = 4 under the old method. Under the new conversion table, a borderline case that could be ○2△2 = 3. The user's sense was that 4 was appropriate, so △ is limited to "clear defects," and minor imperfections are treated as leaning ○.
+- Real evaluation example (EURNZD 5m long, 2026/6/17 / K4 calibration example): Initially K4=○ with overall 3, but measuring the break location gave A=1.9930 / B=1.9905 / X=1.99194 / R=0.0025, so **r≈0.58 (upper half of the correction)**, g≈0.54. The break came after retracing about 14 pips from the 200EMA touch (B=1.9905), which is not "near the touch" → under the new K4 system, **K4=×**. K4 is non-core, so under the new conversion table Axis 2 stays at 3, and through the gate the overall remains **3 (Caution)** (= the verdict label is the same as initially, but the breakdown was corrected from K4○→× and Axis 2: 5→3, making the location of the error explicit). The RRR was also compressed toward 1:1 at about 1:1.2, supporting the late entry. Saved as a typical example of mistaking "a break within the same corrective structure" for "near."
 
-## 特則の過剰発動による誤評価(2026/6/18 GBPAUD 5m ショート / 再発防止アンカー)
+## Misjudgment from over-invoking the special rule (2026/6/18 GBPAUD 5m short / anchor to prevent recurrence)
 
-200EMAへ下から接近して切り上げラインをブレイクするショート setup を、当初**総合2(見送り推奨)**と評価したが、ユーザーの指摘で**総合3(要注意)に訂正**した。原因は特則(ハードキャップ)を**未確定の段階で確定発動させた**こと。3つの誤りと正しい扱い:
+A short setup approaching the 200EMA from below and breaking an ascending line was initially evaluated as **overall 2 (Skip Recommended)**, but **corrected to overall 3 (Caution)** after the user pointed it out. The cause was that the special rule (hard cap) was **invoked as confirmed at an undetermined stage**. The three errors and the correct handling:
 
-1. **「張り付き気味」と書いて特則トリガー2を発動** → 誤り。200EMA到達は**実質ローソク1本**で、接触ゾーンが3本未満。c も a も測定不能であり、正しくは **R=未確定**。未確定では特則は発動しない。「〜気味」で張り付き認定したのが過大。
-2. **「スクイーズ該当」と書いて特則トリガー1を発動** → 誤り。ラインとEMAが幾何学的に収束しているだけ(頂点に到達したのみ)で、ウェッジ内部での3本以上の圧縮揉み合い・両境界への交互タッチが無い。正しくは**スクイーズ=形成途上=非該当(監視)**。
-3. **「深い戻し」と参照元を示さず断定** → 誤り。広義下降(1.8880→1.8800=80pips)に対し戻り46pips=**約58%で正常域**(深さ単独では非減点)。実際の弱点は深さではなく「直近の微小下げ脚の起点を上抜けした=micro higher high(K3のトレンド否定の論点)」であり、両者を混同していた。戻りがEMAに到達したこと自体を「深い/危険」と誤認したのも category error。
+1. **Wrote "clinging-ish" and invoked special-rule trigger 2** → wrong. The 200EMA was reached by **effectively one candle**, and the contact zone was fewer than 3 candles. Neither c nor a was measurable; correctly, **R = undetermined**. The special rule is not invoked when undetermined. Recognizing clinging from "-ish" was an overreach.
+2. **Wrote "squeeze applies" and invoked special-rule trigger 1** → wrong. The line and the EMA were merely converging geometrically (had only reached the apex), with no compressed chop of 3 or more candles inside the wedge and no alternating touches of both boundaries. Correctly, **squeeze = forming = not applicable (monitor)**.
+3. **Asserted a "deep pullback" without stating the reference** → wrong. Against the broader decline (1.8880→1.8800 = 80 pips), a 46-pip pullback = **about 58%, within the normal range** (depth alone is not a deduction). The actual weakness was not depth but "breaking above the origin of the most recent micro down-leg = a micro higher high (the trend-negation issue of K3)," and the two had been confused. Mistaking the pullback reaching the EMA itself for "deep/dangerous" was also a category error.
 
-**正しい内訳**: 軸1=3(S3×=天井未形成、S1/S2△)、軸2=3(K1○ K2○ K3△ K4△、K4は r≈0.44/g≈0.42 の遅いブレイク)、特則**非該当**、ゲートで**総合3**。下げ止め理由は「張り付き・深い戻し」ではなく「**200EMA反応が未確定(反発未確認)+ ブレイクが遅い**」という確認待ちであった。
+**Correct breakdown**: Axis 1 = 3 (S3× = top not formed, S1/S2 △), Axis 2 = 3 (K1○ K2○ K3△ K4△; K4 was a late break with r≈0.44/g≈0.42), special rule **not applicable**, overall **3** through the gate. The reason for holding back was not "clinging / deep pullback" but awaiting confirmation: "**the 200EMA reaction is undetermined (bounce not confirmed) + the break is late**."
 
-**教訓(原則化)**: ハードキャップ(特則)は陽性確認を要する。軸採点は「迷ったら低い方」でよいが、特則は「迷ったら発動しない」。200EMAタッチとラインブレイクが同時に来る本手法では「反応未確定」は頻出の正常状態であり、これを張り付き側へ寄せて2に縛ってはならない。未確定は要注意(3・確認待ち)に落とす。
+**Lesson (made into a principle)**: The hard cap (special rule) requires positive confirmation. For axis scoring, "when in doubt, go lower" is fine, but for the special rule, "when in doubt, do not invoke it." In this strategy, where the 200EMA touch and the line break come at the same time, "reaction undetermined" is a frequent, normal state; it must not be pushed toward clinging and capped at 2. Undetermined drops to Caution (3, awaiting confirmation).

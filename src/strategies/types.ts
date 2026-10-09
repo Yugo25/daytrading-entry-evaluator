@@ -1,45 +1,45 @@
-// 手法(ストラテジー)プラグインの共通インターフェース。
-// 判定器・UI・ジャーナルはすべてこの定義だけを見て動く。
+// Common interface for strategy plugins.
+// The evaluator, UI and journal all work off this definition alone.
 
 export type Mark = "○" | "△" | "×";
 
 export interface ObservationItem {
   key: string; // "①"
-  label: string; // "推進波"
-  hint: string; // 抽出する内容
+  label: string; // "Impulse wave"
+  hint: string; // what to extract
 }
 
 export interface CriterionElement {
   key: string; // "S1"
-  label: string; // "波動リズム"
-  core: boolean; // 中核要素か(×で軸スコア上限2)
-  pass: string; // ○の基準
-  fail: string; // ×の典型
-  partial?: string; // △の基準(手法が明示している場合)
+  label: string; // "Wave rhythm"
+  core: boolean; // core element? (× caps the axis score at 2)
+  pass: string; // criterion for ○
+  fail: string; // typical ×
+  partial?: string; // criterion for △ (when the strategy defines one explicitly)
 }
 
 export interface Axis {
   key: string; // "axis1"
-  label: string; // "スイング明確性"
-  subtitle: string; // "波動構造の質"
+  label: string; // "Swing Clarity"
+  subtitle: string; // "Quality of the wave structure"
   elements: CriterionElement[];
 }
 
 export interface VerdictLabel {
   score: 1 | 2 | 3 | 4 | 5;
-  label: string; // "適格(模範級)"
+  label: string; // "Qualified (Exemplary)"
   meaning: string;
 }
 
 export interface StrategyDoc {
-  name: string; // 表示名
-  path: string; // strategies/<id>/... からの相対パス
+  name: string; // display name
+  path: string; // relative path from strategies/<id>/
   role: "skill" | "reference";
 }
 
 export interface StrategyDefinition {
   id: string; // "ema200"
-  name: string; // "200EMA手法"
+  name: string; // "200EMA Strategy"
   shortName: string; // "200EMA"
   description: string;
   enabled: boolean;
@@ -50,14 +50,14 @@ export interface StrategyDefinition {
   verdicts: VerdictLabel[];
   specialRules: { key: string; label: string; description: string }[];
   docs: StrategyDoc[];
-  /** 総合評価表の行(手法固有)。モデルは overall.rows にこのキーで値を返す。mainCause は必ず含める */
+  /** Rows of the overall evaluation table (strategy-specific). The model returns values under these keys in overall.rows. Must include mainCause */
   overallRows: { key: string; label: string; hint: string }[];
-  /** 結果Markdownの見出し(省略時 "評価結果") */
+  /** Heading of the result Markdown (defaults to "Evaluation Result") */
   resultTitle?: string;
-  /** 数値データ入力欄のプレースホルダ(手法が要求する価格のキー例) */
+  /** Placeholder for the numeric data input (example price keys the strategy asks for) */
   numericPlaceholder?: string;
-  /** 上位足フィルター行・入力欄のラベル(省略時 "STEP 0") */
+  /** Label for the higher-timeframe filter row / input (defaults to "STEP 0") */
   higherTfLabel?: string;
-  /** 判定モデルに渡す追加指示(出力形式の固定など) */
+  /** Extra instructions passed to the evaluation model (e.g. pinning the output format) */
   promptNotes?: string;
 }

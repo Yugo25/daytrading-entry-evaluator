@@ -1,14 +1,14 @@
 import type { StrategyDefinition } from "@/strategies/types";
 import { overallRow, type EvaluationOutput } from "./schema";
 
-/** 構造化出力をスキルの出力テンプレートと同一構成のMarkdownに変換する */
+/** Convert the structured output into Markdown with the same structure as the skill's output template */
 export function renderEvaluation(strategy: StrategyDefinition, out: EvaluationOutput): string {
   const lines: string[] = [];
-  lines.push(`## ${strategy.resultTitle ?? "評価結果"}`);
-  lines.push(`方向: ${out.direction}`);
+  lines.push(`## ${strategy.resultTitle ?? "Evaluation Result"}`);
+  lines.push(`Direction: ${out.direction}`);
   lines.push("");
-  lines.push("### 観察");
-  lines.push("| 要素 | 読み取り |");
+  lines.push("### Observations");
+  lines.push("| Element | Reading |");
   lines.push("|---|---|");
   for (const o of strategy.observations) {
     const found = out.observations.find((x) => x.key === o.key);
@@ -17,8 +17,8 @@ export function renderEvaluation(strategy: StrategyDefinition, out: EvaluationOu
   lines.push("");
   strategy.axes.forEach((axis, i) => {
     const a = out.axes.find((x) => x.key === axis.key);
-    lines.push(`### 軸${i + 1}: ${axis.label} — ${a?.score ?? "?"}/5`);
-    lines.push("| 要素 | 判定 | 根拠 |");
+    lines.push(`### Axis ${i + 1}: ${axis.label} — ${a?.score ?? "?"}/5`);
+    lines.push("| Element | Mark | Basis |");
     lines.push("|---|---|---|");
     for (const el of axis.elements) {
       const e = a?.elements.find((x) => x.key === el.key);
@@ -27,14 +27,14 @@ export function renderEvaluation(strategy: StrategyDefinition, out: EvaluationOu
     lines.push("");
     if (a?.note) lines.push(a.note, "");
   });
-  lines.push(`### 総合評価 — ${out.overall.score}/5(${out.overall.label})`);
-  lines.push("| 判定根拠 | 内容 |");
+  lines.push(`### Overall Evaluation — ${out.overall.score}/5 (${out.overall.label})`);
+  lines.push("| Basis | Content |");
   lines.push("|---|---|");
   for (const r of strategy.overallRows) lines.push(`| ${r.label} | ${overallRow(out, r.key)} |`);
   if (out.overall.score <= 3 && out.improvements.length) {
     lines.push("");
-    lines.push("**改善提案**");
-    lines.push("| 弱点 | 改善トリガー |");
+    lines.push("**Improvements**");
+    lines.push("| Weakness | Improvement trigger |");
     lines.push("|---|---|");
     for (const im of out.improvements) lines.push(`| ${im.weakness} | ${im.trigger} |`);
   }

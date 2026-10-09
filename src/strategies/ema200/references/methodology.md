@@ -1,36 +1,36 @@
-# 200EMA手法 要点(ライン評価に必要な範囲)
+# 200EMA Strategy Key Points (the scope needed for line evaluation)
 
-## 手法の構造
+## Structure of the strategy
 
-- 執行足: 5分足(1分足・1hでも可)。指標: 20EMAと200EMA。
-- STEP 0(上位足フィルター): 15m・1hの200EMAが両方ともエントリー方向に傾いていること。横ばい不可。**このスキルの評価対象外**(画像から判定できないため)。
-- STEP 1: 20EMA/200EMAのゴールデン/デッドクロスで方向感を確定。
-- STEP 2: 価格の200EMAタッチ(調整波の戻り)を確認。
-- STEP 3: 調整波のスイング高安値を結んだ切り下げ/切り上げラインの実体ブレイクでエントリー。**このスキルが評価するのはここ**。
+- Execution timeframe: 5m (1m and 1h are also allowed). Indicators: 20EMA and 200EMA.
+- STEP 0 (higher-timeframe filter): the 200EMA on both 15m and 1h is sloping in the entry direction. Flat is not allowed. **Outside the scope of this skill's evaluation** (it cannot be judged from the image).
+- STEP 1: Fix the directional bias with the 20EMA/200EMA golden/dead cross.
+- STEP 2: Confirm price touching the 200EMA (the pullback of the corrective wave).
+- STEP 3: Enter on a candle-body break of the descending/ascending line connecting the swing highs/lows of the corrective wave. **This is what this skill evaluates.**
 
-## 有効なラインの定義(原文の核心)
+## Definition of a valid line (core of the original text)
 
-- 本物の調整波には逆張り勢の出入りで明確なスイング高安値ができる。そのラインのブレイク = 逆張り勢の降車 = 推進波再開。
-- ジリ下げ/ジリ上げ・レンジは蓄積(ビルドアップ)。スイングが立たず、無理に引けばラインは何本でも引ける。そのブレイクはノイズで、最終解決は200EMA側(SL側)に出る。
-- ラインはブレイク前の時点で引けるピボットだけで確定する。後から引き直さない。
-- ピボットが名前のつく反転構造(ダブルトップ/ボトム、三尊)を構成していること。
-- 判定ヒューリスティック:
-  - クラスターの真ん中を通したくなったら → スクイーズ判定で見送り
-  - 同程度に妥当なラインが3本引けるなら → 見送り
-  - 価格が反応していないライン = 自分が当てはめたライン → 無効
+- A genuine corrective wave forms clear swing highs and lows as counter-trend traders enter and exit. A break of that line = the counter-trend traders getting off = the impulse wave resuming.
+- A slow grind down / slow grind up or a range is accumulation (build-up). No swings form, and if you force it, you can draw any number of lines. Its break is noise, and the final resolution comes on the 200EMA side (the SL side).
+- The line is fixed using only pivots that can be drawn before the break. Do not redraw it afterward.
+- The pivots form a named reversal structure (double top/bottom, head and shoulders).
+- Judgment heuristics:
+  - If you feel like drawing through the middle of a cluster → skip as a squeeze
+  - If three equally valid lines can be drawn → skip
+  - A line price has not reacted to = a line you fitted yourself → invalid
 
-## 最大の警戒点
+## The biggest warning point
 
-200EMAでの「反発」狙いが「ブレイク」に化けるケース。兆候:
-- 200EMAとラインの間に価格が詰まるスクイーズ
-- 200EMA付近での揉み合い(ビルドアップ)
-- このとき200EMAの傾きはほぼフラットになっている
+Cases where aiming for a "bounce" at the 200EMA turns into a "break." Signs:
+- A squeeze where price gets compressed between the 200EMA and the line
+- Chop near the 200EMA (build-up)
+- At such times, the slope of the 200EMA is almost flat
 
-フィルターの層: STEP 0(傾き)は文脈レベル、ライン定義は構造レベル。**200EMAが傾いていてもスクイーズは起こりうる**(強い推進波直後のEMA沿いの窮屈なフラッグ/三角)。ライン評価はSTEP 0をすり抜ける負けを拾う第二の防御線。
+Layers of filtering: STEP 0 (slope) is at the context level; the line definition is at the structure level. **A squeeze can happen even when the 200EMA is sloping** (a tight flag/triangle along the EMA right after a strong impulse wave). Line evaluation is the second line of defense that catches losses that slip through STEP 0.
 
-## 決済(参考)
+## Exits (reference)
 
-- SL: 調整波の最後の高値/安値
-- TP: ひとつ前の推進波のN計算値
-- BE: EMA逆クロスで決済
-- RRR 1:1〜1:3、N計算値が直近高安値を超えていること
+- SL: the last high/low of the corrective wave
+- TP: the N-calculation value of the previous impulse wave
+- BE: exit on an EMA counter-cross
+- RRR 1:1–1:3, and the N-calculation value must exceed the most recent high/low

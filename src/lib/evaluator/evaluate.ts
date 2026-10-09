@@ -17,7 +17,7 @@ const FEW_SHOT_LIMIT = 8;
 type ImageMedia = "image/png" | "image/jpeg" | "image/webp" | "image/gif";
 
 async function loadFewShot(strategyId: string): Promise<FewShotExample[]> {
-  // 不同意(訂正あり)を優先し、同意例も少量混ぜて「正しく判定できた形」も示す
+  // Prioritize disagreements (with corrections), and mix in a few agreements to also show "what a correct judgment looks like"
   const reviews = await prisma.review.findMany({
     where: { useAsExample: true, evaluation: { strategyId } },
     include: { evaluation: { include: { setup: true } } },
@@ -42,7 +42,7 @@ export async function evaluateSetup(setupId: string) {
     include: { images: { orderBy: { order: "asc" } } },
   });
   const strategy = getStrategy(setup.strategyId);
-  if (!strategy.enabled) throw new Error(`${strategy.name} はまだ有効化されていません`);
+  if (!strategy.enabled) throw new Error(`${strategy.name} is not enabled yet`);
 
   const fewShot = await loadFewShot(strategy.id);
   const system = buildSystemPrompt(strategy);
@@ -50,23 +50,23 @@ export async function evaluateSetup(setupId: string) {
   const content: Anthropic.ContentBlockParam[] = [];
   for (const img of setup.images) {
     const data = (await readFile(img.path)).toString("base64");
-    const roleLabel = img.role === "EXEC" ? "執行足チャート(評価対象)" : img.role === "HIGHER" ? `上位足チャート(${strategy.higherTfLabel ?? "STEP 0"}の参考)` : "補足画像";
+    const roleLabel = img.role === "EXEC" ? "Execution-TF chart (subject of evaluation)" : img.role === "HIGHER" ? `Higher-TF chart (reference for ${strategy.higherTfLabel ?? "STEP 0"})` : "Supplementary image";
     content.push({ type: "text", text: `[${roleLabel}: ${img.mimeType}]` });
     content.push({ type: "image", source: { type: "base64", media_type: img.mimeType as ImageMedia, data } });
   }
   const userLines = [
-    `通貨ペア: ${setup.pair}`,
-    `執行足: ${setup.execTf}(${strategy.higherTfLabel ?? "STEP 0"}参照足: ${strategy.higherTimeframes[setup.execTf]?.join("・") ?? "—"})`,
-    setup.direction ? `想定方向: ${setup.direction}` : "想定方向: 未指定(画像から読み取る)",
+    `Pair: ${setup.pair}`,
+    `Execution TF: ${setup.execTf} (${strategy.higherTfLabel ?? "STEP 0"} reference TFs: ${strategy.higherTimeframes[setup.execTf]?.join(", ") ?? "—"})`,
+    setup.direction ? `Intended direction: ${setup.direction}` : "Intended direction: not specified (read it from the image)",
   ];
-  if (setup.numericData) userLines.push("数値データ(JSON):", setup.numericData);
-  if (setup.notes) userLines.push("ユーザーメモ(評価本体は画像から独立に行い、評価後に一致/相違に触れてよい):", setup.notes);
+  if (setup.numericData) userLines.push("Numeric data (JSON):", setup.numericData);
+  if (setup.notes) userLines.push("User notes (perform the evaluation itself independently from the image; afterwards you may comment on agreement/disagreement):", setup.notes);
   const fewShotBlock = buildFewShotBlock(fewShot);
   if (fewShotBlock) userLines.push("", fewShotBlock);
-  userLines.push("", "上記のセットアップを手法基準に照らして評価し、JSONスキーマに従って出力してください。");
+  userLines.push("", "Evaluate the setup above against the strategy criteria and output according to the JSON schema. Write all text in English.");
   content.push({ type: "text", text: userLines.join("\n") });
 
-  // 長い思考を伴うためストリーミングで受ける(非ストリーミングだとHTTPタイムアウト→再試行で数分〜十数分かかる)
+  // Receive as a stream because of the long thinking (non-streaming hits HTTP timeouts → retries, taking several to 10+ minutes)
   const response = await client.messages
     .stream(
       {
@@ -82,10 +82,10 @@ export async function evaluateSetup(setupId: string) {
     .finalMessage();
 
   if (response.stop_reason === "refusal") {
-    throw new Error(`モデルが応答を拒否しました: ${response.stop_details?.explanation ?? ""}`);
+    throw new Error(`The model refused to respond: ${response.stop_details?.explanation ?? ""}`);
   }
   const out = response.parsed_output;
-  if (!out) throw new Error("構造化出力の解析に失敗しました");
+  if (!out) throw new Error("Failed to parse the structured output");
 
   const evaluation = await prisma.evaluation.create({
     data: {

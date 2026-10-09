@@ -1,86 +1,86 @@
-### 考え方の核
+### The core idea
  
-エントリーには性質の違う2つの確認があり、**両方が同じ方向を向いて初めて成立する**。
+An entry has two confirmations of different natures, and **it holds only when both point in the same direction**.
  
-- **クロスの「方向感」** … 20EMA/200EMAのクロスが示す、これから狙う方向のバイアス。あくまで「どっちを見るか」の合図でしかない。
-- **200EMAの「傾きの方向」** … 上位足(15m・1h)で200EMA自体が実際にその方向へ傾いているか。これがトレンドが本当に動いている証拠。
+- **The "directional bias" of the cross** … the bias toward the direction we are about to target, indicated by the 20EMA/200EMA cross. It is only a signal of "which way to look."
+- **The "slope direction" of the 200EMA** … whether the 200EMA itself is actually sloping in that direction on the higher timeframes (15m and 1h). This is the evidence that the trend is really moving.
  
-前回の検証で2〜5月に負けが集中したのは、クロスの方向感だけで入り、**200EMAが横ばい(フラット)のレンジ局面で「クロス=シグナル」と誤認していた**ため。傾きの確認はこのレンジの罠を弾くためのフィルターであり、方向感とは別物として必ず分けて確認する。
+In the previous review, losses were concentrated in February–May because I entered on the directional bias of the cross alone, **mistaking "cross = signal" in range phases where the 200EMA was flat**. Checking the slope is a filter to reject this range trap, and must always be checked separately from the directional bias.
  
 ---
  
-### STEP 0:上位足フィルター(最初の関門・ここで落ちたら見送り)
+### STEP 0: Higher-timeframe filter (the first gate; skip if it fails here)
  
-エントリー足の前に、**15mと1hの200EMAの傾き**を確認する。
+Before the entry timeframe, check **the slope of the 200EMA on 15m and 1h**.
  
-- 15m・1h **両方の200EMAが、狙うエントリー方向に傾いている**こと。
-- **横ばい(フラット)は不可**。逆向きは論外。「クロスしているか」ではなく「傾いているか」で判断する。
-- 15mと1hで傾きが食い違う(片方フラット/逆向き)場合も見送り。
+- The 200EMA on **both 15m and 1h is sloping in the intended entry direction**.
+- **Flat is not allowed.** The opposite direction is out of the question. Judge by "is it sloping," not "has it crossed."
+- Also skip if the slopes on 15m and 1h disagree (one flat / opposite).
  
-> この関門を通らないクロスは、どれだけ形が綺麗でも触らない。
+> A cross that does not pass this gate is not touched, no matter how clean the shape.
 > 
  
-### STEP 1〜3:エントリー手順(STEP 0通過後)
+### STEP 1–3: Entry procedure (after passing STEP 0)
  
-1. 20EMA / 200EMA のゴールデン/デッドクロスを確認(=方向感の確定)。
-2. 価格の200EMAへのタッチを確認(調整波の戻り)。
-3. ダウ理論的なトレンド転換 — 切り下げ/切り上げラインのブレイクを**実体で**確認してエントリー。ただしラインは「最高安値から闇雲に引く」のではなく、**調整波のスイング高安値に沿って引けること**が条件。
-    - ラインが、調整中に**実際に反応している**高安値を結んでいること(2点以上、できれば3点目の反応で確認)。
-    - その高安値が、**名前のつく反転構造**(ダブルトップ/ボトム、三尊)を構成していること。
-    - ラインは**ブレイク前の時点で引けるピボットだけ**で確定する。後から引き直さない。
+1. Confirm the 20EMA / 200EMA golden/dead cross (= fix the directional bias).
+2. Confirm price touching the 200EMA (the pullback of the corrective wave).
+3. Dow-theory trend reversal — enter after confirming the break of the descending/ascending line **with a candle body**. However, the line must not be "drawn blindly from the highest high/lowest low"; the condition is that **it can be drawn along the swing highs/lows of the corrective wave**.
+    - The line connects highs/lows that **actually reacted** during the correction (2 or more points, ideally confirmed by a reaction at a 3rd point).
+    - Those highs/lows form a **named reversal structure** (double top/bottom, head and shoulders).
+    - The line is fixed using **only pivots that can be drawn before the break**. Do not redraw it afterward.
  
 ---
  
-### 有効なラインの定義(STEP 3の最重要補足)
+### Definition of a valid line (the most important supplement to STEP 3)
  
-> ラインの「引きやすさ」そのものを診断材料に使う。
+> Use how "easy the line is to draw" itself as diagnostic material.
 > 
  
-本物の調整波には、逆張り勢の出入りによって**明確なスイング高安値**ができる。その点を結んだラインのブレイク = 逆張り勢が降りた瞬間 = 推進波の再開。だからブレイクが意味を持つ。
+A genuine corrective wave forms **clear swing highs and lows** as counter-trend traders enter and exit. A break of the line connecting those points = the moment the counter-trend traders give up = the resumption of the impulse wave. That is why the break means something.
  
-一方、ジリ下げ/ジリ上げ・レンジは利確による調整ではなく**蓄積(ビルドアップ)**。主導権が定まらずスイングが立たないため、起点がないのに無理に引けばラインは何本でも引けてしまう。その「ブレイク」は転換ではなくノイズで、最終的な解決は200EMA側(=逆方向)に出る — これがSL量産の正体。
+On the other hand, a slow grind down / slow grind up or a range is not a correction from profit-taking but **accumulation (build-up)**. Because control has not been settled and no swings form, if you force a line without an origin, you can draw any number of lines. That "break" is noise, not a reversal, and the final resolution comes on the 200EMA side (= the opposite direction) — this is what mass-produces stop-losses.
  
-判定ヒューリスティック:
+Judgment heuristics:
  
-- クラスターの**真ん中**を通したくなったら → スクイーズ判定で見送り。
-- 同じくらい妥当なラインが**3本引ける**なら → 見送り。
-- 価格が反応していないラインは「市場が引いたライン」ではなく「自分が当てはめたライン」 → 無効。
- 
----
- 
-### 決済(RR)
- 
-- **SL** … 調整波の最後の高値/安値。
-- **TP** … ひとつ前の推進波のN計算値。
-- **BE(建値撤退)** … EMAが逆クロスした時点で決済。
- 
-### 成立条件(すべて満たす)
- 
-- **15m・1hの200EMAがエントリー方向に傾いている**(STEP 0。最重要・横ばい不可)。
-- 切り下げ/切り上げラインが、**反応のある調整波スイング高安値**を結んで引けている(反転構造を構成)。
-- RRRが 1:1 〜 1:3 に収まる。
-- N計算値が直近高安値を超えている。
-- N計算値の参照元となる推進波が、EMAのクロスを伴っていると望ましい。
-- レンジ中のクロスではない(フラットなEMAのクロスは無効)。
- 
-### 見送り条件(ひとつでも該当したら入らない)
- 
-- 15m・1hの200EMAが横ばい、または傾きが食い違う/逆向き。
-- 200EMAがフラットな状態でのクロス。
-- 200EMAタッチ後の戻りがジリ下げ/ジリ上げ・レンジで、**明確なスイング高安値が立たない**(=無理引きでしかラインが引けない)。
-- ラインに価格が反応していない、または反転構造(ダブル/三尊)を構成していない。
-- N計算値が直近高安値を超えていない、または参照推進波にクロスがない。
-- RRRが1:1未満、または1:3超。
+- If you feel like drawing through the **middle** of a cluster → skip as a squeeze.
+- If **three** equally valid lines can be drawn → skip.
+- A line price has not reacted to is not "a line drawn by the market" but "a line you fitted yourself" → invalid.
  
 ---
  
-### 最大の警戒点:「反発」ではなく「200EMAのブレイク」になるケース
+### Exits (RR)
  
-狙いは200EMAでの反発だが、それがブレイクに化けると損切りの山になる(2〜5月がまさにこれ)。
+- **SL** … the last high/low of the corrective wave.
+- **TP** … the N-calculation value of the previous impulse wave.
+- **BE (exit at break-even)** … exit when the EMAs cross in the opposite direction.
  
-- 200EMAと切り上げ/切り下げラインの間に価格が詰まって**スクイーズ**している → 200EMAをブレイクしやすい。
-- 200EMA付近で**揉み合っている** → ブレイクのビルドアップの可能性が高い。
+### Conditions for validity (all must be met)
  
-そして揉み合い・スクイーズの局面では、ほぼ必ず**200EMAの傾きがフラット**になっている。つまりSTEP 0の傾きフィルターは、このブレイクの罠を入口で弾くための最前線の防御になっている。
+- **The 200EMA on 15m and 1h is sloping in the entry direction** (STEP 0. Most important; flat not allowed).
+- The descending/ascending line is drawn connecting **swing highs/lows of the corrective wave that have reacted** (forming a reversal structure).
+- The RRR is within 1:1 to 1:3.
+- The N-calculation value exceeds the most recent high/low.
+- Preferably, the impulse wave used as the reference for the N calculation comes with an EMA cross.
+- It is not a cross within a range (a cross of flat EMAs is invalid).
  
-**フィルターの層を分けて理解する:** STEP 0(傾き)は「そもそもトレンドがあるか」という**文脈レベル**のフィルター。有効なラインの定義は「この戻りが本物の調整か、ビルドアップか」という**構造レベル**のフィルター。重要なのは、**200EMAが傾いていてもスクイーズは起こりうる**こと(強い推進波直後のEMA沿いの窮屈なフラッグ/三角はSTEP 0を通過する)。ラインフィルターはSTEP 0をすり抜ける負けを入口で拾う、第二の防御線にあたる。
+### Skip conditions (do not enter if even one applies)
+ 
+- The 200EMA on 15m and 1h is flat, or the slopes disagree / point the opposite way.
+- A cross while the 200EMA is flat.
+- The pullback after the 200EMA touch is a slow grind down/up or a range, and **no clear swing highs/lows form** (= a line can only be forced).
+- Price has not reacted to the line, or it does not form a reversal structure (double / head and shoulders).
+- The N-calculation value does not exceed the most recent high/low, or the reference impulse wave has no cross.
+- The RRR is below 1:1 or above 1:3.
+ 
+---
+ 
+### The biggest warning point: cases that become a "200EMA break" instead of a "bounce"
+ 
+The aim is a bounce at the 200EMA, but when it turns into a break, it becomes a pile of stop-losses (February–May was exactly this).
+ 
+- Price is compressed between the 200EMA and the ascending/descending line in a **squeeze** → the 200EMA is likely to break.
+- Price is **chopping** near the 200EMA → there is a high chance it is a build-up for a break.
+ 
+And in chop/squeeze phases, **the slope of the 200EMA is almost always flat**. In other words, the STEP 0 slope filter is the front-line defense that rejects this break trap at the entrance.
+ 
+**Understand the filters as separate layers:** STEP 0 (slope) is a **context-level** filter: "is there a trend in the first place?" The definition of a valid line is a **structure-level** filter: "is this pullback a genuine correction, or a build-up?" Importantly, **a squeeze can happen even when the 200EMA is sloping** (a tight flag/triangle along the EMA right after a strong impulse wave passes STEP 0). The line filter is the second line of defense that catches, at the entrance, the losses that slip through STEP 0.

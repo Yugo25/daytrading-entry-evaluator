@@ -1,202 +1,202 @@
 ---
 name: ema20-entry-eval
-description: 20EMA手法のエントリー妥当性を、執行足チャート画像1枚から客観的・機械的に評価するスキル。ユーザーがXAUUSD・USDJPY等の1分足/5分足/1h足の執行足チャート画像をアップロードし「この20EMAエントリーを評価して」「20EMA手法の基準を満たしているか」「第一波・調整波・タッチの判定」「20EMA手法でチェックして」などと依頼したとき、Notionのトレード記録ページ名を指定して20EMA手法の評価を求めたとき、エントリー前のチャート検証・トレード振り返り・押し目判定を求めたときは必ずこのスキルを使用する。チャートに20/200EMA・GC/DCの目印・20EMAタッチ・エントリーボックスが描かれていて評価や判定を求められた場合も使用する。なお200EMA手法の切り下げ/切り上げライン評価とは別物であり、20/200EMAクロス後の初回押し目（＝エリオット第3波）を獲りにいく手法の妥当性評価に用いる。
+description: A skill that objectively and mechanically evaluates whether an entry is valid under the 20EMA strategy, from a single execution-timeframe chart image. Always use this skill when the user uploads an execution-timeframe chart image (1m/5m/1h, e.g. XAUUSD or USDJPY) and asks things like "evaluate this 20EMA entry", "does this meet the 20EMA strategy criteria", "judge the Wave 1 / corrective wave / touch", or "check this against the 20EMA strategy"; when the user names a Notion trade-log page and asks for a 20EMA strategy evaluation; or when the user asks for a pre-entry chart check, a trade review, or a pullback judgment. Also use it when a chart showing the 20/200EMA, GC/DC markers, a 20EMA touch and an entry box is presented for evaluation. This is separate from the descending/ascending trendline evaluation of the 200EMA strategy; it evaluates the validity of a strategy that targets the first pullback after a 20/200EMA cross (= Elliott Wave 3).
 ---
 
-# 20EMA手法 エントリー評価スキル
+# 20EMA Strategy Entry Evaluation Skill
 
-## このスキルの目的
+## Purpose of this skill
 
-20EMA手法のエントリーが「基準を満たした適格なセットアップか」を、執行足チャート1枚から、観察5要素と判定5項目で機械的に採点し、5点満点の総合判定を出す。判定は常に同一フォーマットで出力し、結果論と印象評価を排する。
+Determine whether a 20EMA strategy entry is "a qualified setup that meets the criteria" by mechanically scoring a single execution-timeframe chart with 5 observation elements and 5 judgment items, and output an overall verdict out of 5. Always output in the same format, and exclude hindsight and impression-based evaluation.
 
-## 手法の本質
+## The essence of the strategy
 
-この手法は **「壊された構造が残した未到達の目標へ向かう動き」を獲る** ものである。優位性の源泉は波動の形成順序にある。
+This strategy captures **"the move toward an unreached target left behind by a broken structure."** Its edge comes from the order in which the waves form.
 
-1. **左側に波動がある** — 旧トレンドが高安値構造を残している
-2. **その構造を否定する第一波が出る** — 旧トレンドの押し安値/戻り高値を実体で抜く
-3. **第一波に対する第二波（調整）が来る** — 20EMAタッチで確認
-4. **第3波を獲る** — TPは旧トレンドが残した未到達の高安値に置く
+1. **There are waves on the left** — the old trend has left a structure of highs and lows
+2. **A Wave 1 that negates that structure appears** — it breaks the old trend's swing low/swing high with a candle body
+3. **A Wave 2 (correction) against Wave 1 follows** — confirmed by a 20EMA touch
+4. **Capture Wave 3** — the TP is placed at an unreached high/low left behind by the old trend
 
-判定すべきはこの連鎖が成立しているかだけである。エントリー前に前のめりになると、この連鎖の各段階を「だいたい出来ている」で誤魔化しやすい。**各項目は価格を指名して答える。指名できない項目は○にしない。**
+The only thing to judge is whether this chain holds. When you are eager to enter, it is easy to gloss over each stage of the chain as "roughly there." **Answer every item by naming a price. An item for which you cannot name a price is never marked ○.**
 
-## 執行足について
+## About the execution timeframe
 
-- 基本の執行足は **5分足**。ただし **1分足・1h足でエントリーすることもある**。
-- 執行足が1mや1hの場合も基準をそのまま適用する。タイムフレーム不一致の注記は不要。
-- **入力は執行足チャート画像のみ**。上位足の方向感・AOIの質は画像から判定できないため採点対象外。
+- The default execution timeframe is **5m**. However, **entries are also made on 1m and 1h**.
+- When the execution timeframe is 1m or 1h, apply the criteria as is. No note about a timeframe mismatch is needed.
+- **The input is the execution-timeframe chart image only.** The higher-timeframe direction and the quality of the AOI cannot be judged from the image, so they are not scored.
 
-## 入力チャートの読み取り規約
+## Conventions for reading the input chart
 
-評価対象としてユーザーが与える執行足チャート画像（TradingView）は、以下の規約で読む:
+Read the execution-timeframe chart image (TradingView) given by the user according to the following conventions:
 
-- **緑のローソク = 陽線、黒のローソク = 陰線**
-- **薄い青 = 20EMA、濃い青 = 200EMA**
-- **緑の垂直線 = 最新のゴールデンクロス(GC)発生地点、オレンジ/赤の垂直線 = デッドクロス(DC)発生地点**
-- **緑の印 = GC後はじめての20EMAへの価格タッチ、オレンジ/赤の印 = DC後はじめてのタッチ**（＝クロス後初回タッチの目印。W4に対応する）
-- **灰色の線 = 2本のみ**。①TP基準となる高安値（左側の旧トレンドが残した押し安値/戻り高値）、②タッチ足の高安値（＝エントリートリガーの基準価格）
-- **灰色のボックス = 上位足のAOI**。参考情報であり採点には用いない
-- **緑/赤のボックス = エントリー**。境目が建値、**赤側がSL方向、緑側がTP方向**。ロングなら赤が下・緑が上、ショートなら赤が上・緑が下
+- **Green candles = bullish, black candles = bearish**
+- **Light blue = 20EMA, dark blue = 200EMA**
+- **Green vertical line = where the latest golden cross (GC) occurred; orange/red vertical line = where a dead cross (DC) occurred**
+- **Green marker = the first price touch of the 20EMA after a GC; orange/red marker = the first touch after a DC** (= the marker for the first touch after the cross; corresponds to W4)
+- **Gray lines = exactly two.** ① The high/low used as the TP reference (the swing low/swing high left behind by the old trend on the left), ② the high/low of the touch candle (= the reference price for the entry trigger)
+- **Gray box = the higher-timeframe AOI.** Reference information only; not used for scoring
+- **Green/red box = the entry.** The boundary is the entry price; **the red side is toward the SL and the green side toward the TP.** For a long, red is below and green above; for a short, red is above and green below
 
-方向判定: GC(緑)＋緑印＝ロング想定、DC(オレンジ/赤)＋オレンジ/赤印＝ショート想定。エントリーボックスの赤/緑の上下と整合するか確認する。
+Direction: GC (green) + green marker = long assumed; DC (orange/red) + orange/red marker = short assumed. Check that this is consistent with which side of the entry box is red/green.
 
-## 価格読み取りの精度ルール（重要）
+## Price-reading precision rules (important)
 
-チャート画像の右軸目盛は間隔が粗く、目視での価格推定は **誤差±3〜4ドル程度** が残る。したがって:
+The right-axis scale of a chart image is coarse, and visual price estimates retain **an error of roughly ±3–4 dollars**. Therefore:
 
-- **灰色線の2価格（TP基準・トリガー）と、エントリーボックスの建値/SL/TPは図から確定できる。** これらは読み取ってよい。
-- **第一波の起点・極値・戻り高値の3価格は、目視推定すると判定が反転しうる。** ユーザーが数値を添えている場合は必ずそれを採用する。
-- ユーザーが数値を添えておらず、かつ目視推定値と判定の境界が誤差範囲内で接近する場合は、**推測で断定せず、該当価格を1つ聞き返す。** 曖昧なまま点を付けない。
-- 入力を促す定型: 「第一波の起点／極値／戻りの極値を数値で教えてください」
+- **The two gray-line prices (TP reference and trigger) and the entry/SL/TP of the entry box can be determined from the chart.** These may be read.
+- **The three prices — Wave 1 origin, Wave 1 extreme, and the pullback extreme — can flip the verdict if estimated visually.** If the user provides the numbers, always use them.
+- If the user has not provided the numbers and the visual estimate is within the error range of a judgment boundary, **do not assert based on a guess; ask back for one of those prices.** Do not assign a score while it remains ambiguous.
+- Standard prompt for input: "Please give me the Wave 1 origin / Wave 1 extreme / pullback extreme as numbers."
 
-## 観察フェーズ（固定5要素）
+## Observation phase (fixed 5 elements)
 
-採点の前に、必ず以下を抽出して言語化する。
+Before scoring, always extract and put into words the following.
 
-| 要素 | 抽出する内容 |
+| Element | What to extract |
 |---|---|
-| ① クロス | 20/200EMAクロスの種別(GC/DC)・方向・位置。タッチ印が**クロス後初回**か |
-| ② 第一波 | 起点・極値の価格と値幅。旧トレンドのどの高安値を実体で抜いたか |
-| ③ 転換波動・TP基準 | 左側の旧トレンドの高安値構造。TP基準(灰色線)が**未到達**で残っているか |
-| ④ 調整波 | 戻りの極値。第一波の起点を超えていないか。20EMAタッチの有無 |
-| ⑤ トリガー | タッチ足の高安値(灰色線)の価格。建値/SL/TPボックスの位置 |
+| ① Cross | Type (GC/DC), direction and location of the 20/200EMA cross. Whether the touch marker is the **first after the cross** |
+| ② Wave 1 | Prices and size of the origin and the extreme. Which high/low of the old trend it broke with a candle body |
+| ③ Reversal waves / TP reference | The high/low structure of the old trend on the left. Whether the TP reference (gray line) remains **unreached** |
+| ④ Corrective wave | The pullback extreme. Whether it has gone beyond the Wave 1 origin. Whether the 20EMA was touched |
+| ⑤ Trigger | The price of the touch candle's high/low (gray line). The positions of the entry/SL/TP box |
 
-## 判定フェーズ（固定5項目）
+## Judgment phase (fixed 5 items)
 
-各項目に **○(明確に満たす)/△(確認不足)/×(不適合)** を付ける。
+Mark each item **○ (clearly met) / △ (insufficiently confirmed) / × (not met)**.
 
-| # | 項目 | ○の基準 | △の基準 | ×の基準 |
+| # | Item | ○ criterion | △ criterion | × criterion |
 |---|---|---|---|---|
-| W1 | 左側の波動 | 旧トレンドの高安値構造を価格で指名できる | 構造はあるが価格が特定しきれない | 旧トレンドの構造が読めない |
-| W2 | 構造否定 | 第一波が旧構造の押し安値/戻り高値を**実体**で抜いた | ヒゲ抜けのみ／抜けた水準が特定できない | 抜いていない |
-| W3 | 起点の維持 | 戻りの極値が第一波の**起点を超えていない** | 起点と同値付近で判別困難 | 起点を超えた |
-| W4 | 第二波の確認 | 20EMAに**実タッチ**、かつクロス後**初回** | タッチが未達／ほぼ接触で判別困難 | 2度目以降のタッチ |
-| W5 | TP基準の残存 | 転換波動内に**未到達**の高安値があり灰色線と一致 | TP線はあるが波動内の位置が曖昧 | 未到達の基準が残っていない |
+| W1 | Waves on the left | The old trend's high/low structure can be named by price | There is a structure but prices cannot be fully identified | The old trend's structure cannot be read |
+| W2 | Structure break | Wave 1 broke the old structure's swing low/swing high with a **candle body** | Wick-only break / the broken level cannot be identified | Did not break |
+| W3 | Origin held | The pullback extreme **has not gone beyond the Wave 1 origin** | Hard to tell, at roughly the same price as the origin | Went beyond the origin |
+| W4 | Wave 2 confirmed | **Actual touch** of the 20EMA, and the **first** after the cross | Touch not reached / near contact, hard to tell | Second or later touch |
+| W5 | TP reference remains | There is an **unreached** high/low within the reversal waves and it matches the gray line | There is a TP line but its position within the waves is ambiguous | No unreached reference remains |
 
-### 採点しない項目（明示的に除外）
+### Items not scored (explicitly excluded)
 
-以下は判定に用いない。理由を添えて除外してあるので、復活させないこと。
+The following are not used for judgment. They have been excluded with reasons; do not bring them back.
 
-| 除外項目 | 理由 |
+| Excluded item | Reason |
 |---|---|
-| 第一波の「完成」 | 評価時点で最も伸びた点を極値と呼ぶ以上、定義上つねに真。×になりえない |
-| 戻りの深さ・200EMA到達 | 起点を超えていなければ構造は生きている。深さ自体は無関係 |
-| SLまでの絶対距離 | ロット調整で吸収できるためリスクではない |
-| 調整の所要時間・横ばい | 時間や形状ではなく起点の維持が本質 |
-| 20EMAを跨ぐ回数 | タッチ足は「クロス後最初にタッチした足」で一意に決まり、判断はぶれない |
-| トリガーライン（切り上げ/切り下げ線） | 200EMA手法の要素であり、20EMA手法には存在しない |
-| タッチ足高安値の実体ブレイク確定 | 評価依頼はブレイク前が大半。成立判定ではなく執行条件 |
-| 次足での即ブレイク | ユーザー側で除外する運用（タッチ足の次の足でのブレイクは無効） |
+| "Completion" of Wave 1 | Since the furthest point at evaluation time is called the extreme, it is always true by definition. It can never be × |
+| Depth of the pullback / reaching the 200EMA | If the origin has not been exceeded, the structure is alive. Depth itself is irrelevant |
+| Absolute distance to the SL | Absorbed by lot sizing, so it is not a risk |
+| Time taken by the correction / sideways action | What matters is that the origin holds, not time or shape |
+| Number of times price crosses the 20EMA | The touch candle is uniquely defined as "the first candle to touch after the cross," so the judgment does not waver |
+| Trigger line (ascending/descending line) | An element of the 200EMA strategy; it does not exist in the 20EMA strategy |
+| Confirmed body break of the touch candle's high/low | Most evaluation requests come before the break. It is an execution condition, not a validity judgment |
+| Immediate break on the next candle | Excluded on the user's side as an operating rule (a break on the candle right after the touch candle is invalid) |
 
-### 換算表
+### Conversion table
 
-| 総合 | 条件 |
+| Overall | Condition |
 |---|---|
-| 5 | 5項目すべて○ |
-| 4 | ○4＋△1（×なし） |
-| 3 | △2つ以上（×なし） |
-| 2 | W4のみ×（タッチ未成立＝待ち） |
-| 1 | W1/W2/W3/W5のいずれかが× |
+| 5 | All 5 items ○ |
+| 4 | Four ○ + one △ (no ×) |
+| 3 | Two or more △ (no ×) |
+| 2 | Only W4 is × (touch not formed = wait) |
+| 1 | Any of W1/W2/W3/W5 is × |
 
-判定は上から順に、最初に該当した行を採る。迷ったら低い方に倒す。
+Judge from the top and take the first row that applies. When in doubt, err toward the lower score.
 
-### 即見送り条件（採点外・総合1に直結）
+### Immediate-skip conditions (outside scoring; leads directly to overall 1)
 
-- 上位足と執行足の方向不一致
-- W1/W2/W3/W5のいずれかが×（換算表で自動的に1）
+- The higher-timeframe and execution-timeframe directions do not match
+- Any of W1/W2/W3/W5 is × (automatically 1 by the conversion table)
 
-### RRの扱い
+### Handling of RR
 
-採点に含めない。建値・SL・TPボックスとTP基準線から想定RRRを概算し、総合評価表に補足する。半利・全利の二段がある場合は両方記す。
+Not included in scoring. Estimate the expected RRR from the entry/SL/TP box and the TP reference line, and add it to the overall evaluation table. If there are two stages (half and full take-profit), state both.
 
-## 総合判定ラベル
+## Overall verdict labels
 
-| 総合 | ラベル | 意味 |
+| Overall | Label | Meaning |
 |---|---|---|
-| 5 | 適格(模範級) | 構造として完全。通常通り執行可 |
-| 4 | 適格(標準) | 有効。△の確認を済ませて執行 |
-| 3 | 要注意 | 確認不足が複数。価格を確定させてから再判定 |
-| 2 | 待ち | タッチ未成立。成立を待って再評価 |
-| 1 | 見送り | 構造が成立していない。執行では救えない |
+| 5 | Qualified (Exemplary) | Structurally complete. Can be executed as usual |
+| 4 | Qualified (Standard) | Valid. Execute after confirming the △ items |
+| 3 | Caution | Multiple insufficient confirmations. Pin down the prices and re-evaluate |
+| 2 | Wait | Touch not formed. Wait for it and re-evaluate |
+| 1 | Skip | The structure does not hold. Execution cannot save it |
 
-## 出力フォーマット（厳守・逸脱禁止）
+## Output format (strict; no deviation)
 
-**出力先がチャットでもNotionでも、必ず下記テンプレートと完全に同一の構成・見出し・表構造で出力する。**
+**Whether the output goes to chat or to Notion, always use exactly the same structure, headings and table layout as the template below.**
 
-必須ルール:
-1. **観察は必ず5行の表**（①〜⑤）。箇条書きへの置き換え禁止。
-2. **判定は必ず5行の表**（W1〜W5）。見出しに「— X/5（ラベル）」を必ず含める。
-3. 判定表の直後に**補足2〜3行**（文章）を置く。
-4. 表の「指名価格・根拠」欄は**可能な限り価格を含めた**一言〜短文（目安15〜40字）。
-5. 末尾は**判定根拠の5行固定表**（即見送り/上位足/RR/主因/次の行動）。総合**3以下のときだけ**、その直後に**改善提案の表**を置く。4以上では出さない。
-6. 方向（ロング/ショート、GC/DC、初回タッチ種別）は冒頭1行に書く。
-7. 総合評価に散文段落を書かない。
-8. Notion書き込み時に追加してよいのは末尾の評価日スタンプ1行のみ。
+Required rules:
+1. **Observations are always a 5-row table** (①–⑤). Do not replace it with bullet points.
+2. **Judgment is always a 5-row table** (W1–W5). The heading must include "— X/5 (label)".
+3. Place **2–3 lines of supplementary notes** (prose) right after the judgment table.
+4. The "Named price / basis" column is a word to a short sentence **that includes a price whenever possible** (about 15–40 characters as a guide).
+5. End with the **fixed 5-row basis table** (Immediate skip / Higher TF / RR / Main cause / Next action). **Only when the overall is 3 or lower**, place an **improvements table** right after it. Do not output it for 4 or higher.
+6. Write the direction (long/short, GC/DC, type of first touch) in the first line.
+7. Do not write prose paragraphs in the overall evaluation.
+8. When writing to Notion, the only thing you may add is a single evaluation-date stamp line at the end.
 
 ```
-## 20EMA手法 エントリー評価
-方向: (ロング/ショート、GC/DC、初回タッチ:緑印/オレンジ印)
+## 20EMA Strategy Entry Evaluation
+Direction: (Long/Short, GC/DC, first touch: green marker/orange marker)
 
-### 観察
-| 要素 | 読み取り |
+### Observations
+| Element | Reading |
 |---|---|
-| ① クロス | (種別GC/DC・方向・位置・初回タッチか) |
-| ② 第一波 | (起点・極値の価格・値幅・抜いた水準) |
-| ③ 転換波動・TP基準 | (旧トレンド構造・TP基準が未到達で残るか) |
-| ④ 調整波 | (戻りの極値・起点との比較・20EMAタッチ) |
-| ⑤ トリガー | (タッチ足高安値の価格・建値/SL/TP) |
+| ① Cross | (type GC/DC, direction, location, whether it is the first touch) |
+| ② Wave 1 | (origin/extreme prices, size, level broken) |
+| ③ Reversal waves / TP reference | (old trend structure, whether the TP reference remains unreached) |
+| ④ Corrective wave | (pullback extreme, comparison with origin, 20EMA touch) |
+| ⑤ Trigger | (touch candle high/low price, entry/SL/TP) |
 
-### 判定 — X/5（ラベル）
-| # | 項目 | 判定 | 指名価格・根拠 |
+### Judgment — X/5 (label)
+| # | Item | Mark | Named price / basis |
 |---|---|---|---|
-| W1 | 左側の波動 | ○/△/× | (価格を含む一言) |
-| W2 | 構造否定 | ○/△/× | (価格を含む一言) |
-| W3 | 起点の維持 | ○/△/× | (価格を含む一言) |
-| W4 | 第二波の確認 | ○/△/× | (一言) |
-| W5 | TP基準の残存 | ○/△/× | (価格を含む一言) |
+| W1 | Waves on the left | ○/△/× | (one line including a price) |
+| W2 | Structure break | ○/△/× | (one line including a price) |
+| W3 | Origin held | ○/△/× | (one line including a price) |
+| W4 | Wave 2 confirmed | ○/△/× | (one line) |
+| W5 | TP reference remains | ○/△/× | (one line including a price) |
 
-(補足2〜3行)
+(2–3 lines of supplementary notes)
 
-| 判定根拠 | 内容 |
+| Basis | Content |
 |---|---|
-| 即見送り | 該当なし（該当時のみ条件名を明記 → 総合1） |
-| 上位足 | (方向一致/不一致。採点外の注記) |
-| RR | 建値・SL・TP基準から想定RRR ≈ 1:X.X（半利/全利があれば両方） |
-| 主因 | 点数を決めた要素を一言 |
-| 次の行動 | (執行待ち/確認すべき価格/見送り、を一言) |
+| Immediate skip | None (state the condition only if it applies → overall 1) |
+| Higher TF | (direction match/mismatch; note that it is not scored) |
+| RR | Expected RRR from entry, SL and TP reference ≈ 1:X.X (both if half/full take-profit) |
+| Main cause | The element that determined the score, in one line |
+| Next action | (wait for execution / price to confirm / skip, in one line) |
 
-**改善提案**（総合3以下のときのみ）
-| 弱点 | 改善トリガー |
+**Improvements** (only when overall is 3 or lower)
+| Weakness | Improvement trigger |
 |---|---|
-| (△/×だった要素と一言) | (どう待てば○になるか、一言) |
+| (element that was △/× and one line) | (how to wait so that it becomes ○, one line) |
 ```
 
-## 評価時の注意（客観性の担保）
+## Notes for evaluation (ensuring objectivity)
 
-- **結果論で採点しない。** ブレイク後の値動きが画像に写っていても、評価は「その時点で基準を満たしていたか」に基づく。勝ちトレードでも形が悪ければ低評価、負けトレードでも形が正しければ高評価になりうる。
-- **印象で点を動かさない。** 「なんとなく弱い」「モメンタムが死んでいる」等は判定項目に存在しない。上の5項目の基準にのみ当てはめる。
-- **目視推定で断定しない。** 精度ルールに従い、判定の分かれ目が誤差範囲に入るときは価格を聞き返す。推測値で×を付けない。
-- **項目を増やさない。** 除外表にある項目を「念のため」復活させない。採点項目を増やすほど主観が混入し、実質的に○の数で印象を作ることになる。
-- 上位足の情報は採点対象外であることを明記する。
+- **Do not score in hindsight.** Even if the price action after the break appears in the image, the evaluation is based on "whether the criteria were met at that moment." A winning trade with a bad shape can be rated low, and a losing trade with a correct shape can be rated high.
+- **Do not move the score on impressions.** "Somehow weak" or "momentum is dead" are not judgment items. Apply only the criteria of the 5 items above.
+- **Do not assert from visual estimates.** Following the precision rules, when the dividing line of a judgment falls within the error range, ask back for the price. Do not assign × based on a guessed value.
+- **Do not add items.** Do not revive items in the exclusion table "just in case." The more scoring items you add, the more subjectivity creeps in, effectively building an impression out of the number of ○.
+- State explicitly that higher-timeframe information is not scored.
 
-## Notionページからのチャート画像取得
+## Retrieving chart images from a Notion page
 
-ユーザーがページ名だけを指定し、チャットに画像を添付していない場合:
+When the user specifies only a page name and has not attached an image in the chat:
 
-1. Notionのfetchツールで該当ページを取得。「## 執行足」セクション配下に署名付き画像URL（`prod-files-secure.s3.us-west-2.amazonaws.com`、有効期限1時間）がある
-2. `curl -s -o /home/claude/chart_exec.png "<画像URL>"` でダウンロードし、`file` でPNG/JPEGを確認
-3. viewツールで画像を開いて評価
-4. 「## 上位足」の画像は参考言及にのみ使う
+1. Fetch the page with the Notion fetch tool. Under the "## Execution TF" section there is a signed image URL (`prod-files-secure.s3.us-west-2.amazonaws.com`, valid for 1 hour)
+2. Download it with `curl -s -o /home/claude/chart_exec.png "<image URL>"` and check with `file` that it is a PNG/JPEG
+3. Open the image with the view tool and evaluate
+4. Use the image under "## Higher TF" only for reference mentions
 
-失敗時: ダウンロードが失敗したらページを再fetchして新しいURLを取得。allowlist起因の失敗なら `prod-files-secure.s3.us-west-2.amazonaws.com` の追加を案内し、当面は画像アップロードを依頼する。
+On failure: if the download fails, re-fetch the page to get a new URL. If it fails because of the allowlist, guide the user to add `prod-files-secure.s3.us-west-2.amazonaws.com`, and in the meantime ask them to upload the image.
 
-## 評価結果のNotionへの書き込み
+## Writing the evaluation result to Notion
 
-ユーザーが書き込み先ページを指定した場合（例:「6/14-6/19の中の1.USDJPY」）:
+When the user specifies a destination page (e.g. "1. USDJPY inside 6/14-6/19"):
 
-1. Trading Journal → 週レンジ名 → 通貨ペア名の階層でページを探す
-2. 「AI評価」見出しの下に書き込む。無ければページ末尾に作成
-3. 内容は**出力フォーマットと一字一句同じ構成**。再構成・要約・セクション追加をしない。末尾に評価日スタンプ1行のみ追加可
-4. チャットにも同一の評価結果を表示し、書き込み完了を一言添える
+1. Find the page following the hierarchy Trading Journal → week range name → currency pair name
+2. Write under the "AI Evaluation" heading. If there is none, create it at the end of the page
+3. The content must have **exactly the same structure as the output format, word for word**. Do not restructure, summarize, or add sections. Only a single evaluation-date stamp line may be added at the end
+4. Also show the identical evaluation result in the chat, with a short note that writing is complete
 
-ページが見つからない・複数候補がある場合は、書き込まずに候補を確認する。
+If the page cannot be found or there are multiple candidates, do not write; confirm the candidates first.

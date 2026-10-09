@@ -1,311 +1,311 @@
 ---
 name: trendline-eval
-description: 200EMA手法における切り下げ/切り上げライン(トレンドライン)の妥当性を評価するスキル。ユーザーがXAUUSD・USDCAD等の1分足・5分足または1h足のチャート画像をアップロードし、「このラインを評価して」「エントリー基準を満たしているか」「切り上げ/切り下げラインの判定」「200EMA手法でチェックして」などと依頼したとき、Notionのトレード記録ページ名を指定して評価を求めたとき、またはエントリー前のチャート検証・トレード振り返り・ライン引きの添削を求めたときは必ずこのスキルを使用する。チャート画像にトレンドラインが引かれていて評価や判定を求められた場合も使用する。
+description: A skill that evaluates the validity of a descending/ascending line (trendline) in the 200EMA strategy. Always use this skill when the user uploads a 1m, 5m or 1h chart image (e.g. XAUUSD or USDCAD) and asks things like "evaluate this line", "does this meet the entry criteria", "judge this ascending/descending line", or "check this against the 200EMA strategy"; when the user names a Notion trade-log page and asks for an evaluation; or when the user asks for a pre-entry chart check, a trade review, or feedback on how a line was drawn. Also use it when a chart image has a trendline drawn on it and an evaluation or judgment is requested.
 ---
 
-# 200EMA手法 切り下げ/切り上げライン評価スキル
+# 200EMA Strategy Descending/Ascending Line Evaluation Skill
 
-## このスキルの目的
+## Purpose of this skill
 
-200EMA手法のSTEP 3(ダウ理論的なラインブレイクでのエントリー)において、引かれた切り下げ/切り上げラインが「エントリーに値する有効なライン」かどうかを、固定された観察5要素と評価8要素(各軸4要素×2軸)で構造的に評価し、総合判定を出す。
+In STEP 3 of the 200EMA strategy (entry on a Dow-theory line break), structurally evaluate whether the drawn descending/ascending line is "a valid line worth entering on," using a fixed set of 5 observation elements and 8 evaluation elements (4 elements per axis × 2 axes), and output an overall verdict.
 
-評価の前提となる手法の核心:
-- 本物の調整波には逆張り勢の出入りによって**明確なスイング高安値**ができる。そのスイングを結んだラインのブレイク = 逆張り勢が降りた瞬間 = 推進波の再開。だからこそブレイクに意味がある。
-- ジリ下げ/ジリ上げ・レンジは調整ではなく**蓄積(ビルドアップ)**であり、最終的な解決は200EMAブレイク側(=SL側)に出やすい。
-- 急角度のラインは、調整全体ではなく**末端の小さなサブ波動**だけを捉えたライン。そのブレイクはミクロな一脚の終わりにすぎず、上位の調整構造が継続してSL方向へ動きやすい。
-- ラインの「引きやすさ」そのものが診断材料。無理に引いたラインのブレイクはノイズ。
+The core of the strategy that the evaluation assumes:
+- A genuine corrective wave forms **clear swing highs and lows** as counter-trend traders enter and exit. A break of the line connecting those swings = the moment the counter-trend traders give up = the resumption of the impulse wave. That is exactly why the break means something.
+- A slow grind down / slow grind up or a range is not a correction but **accumulation (build-up)**, and its eventual resolution tends to come on the 200EMA-break side (= the SL side).
+- A steep line captures **only a small sub-wave at the tail end**, not the whole correction. Its break is merely the end of one micro leg; the larger corrective structure tends to continue and move toward the SL.
+- How "easy the line is to draw" is itself diagnostic. The break of a forced line is noise.
 
-手法全体の背景(STEP 0の傾きフィルター等)は `references/methodology.md` を、模範例の特徴は `references/ideal-examples.md` を必要に応じて参照する。
+For the background of the strategy as a whole (the STEP 0 slope filter, etc.) refer to `references/methodology.md`, and for the characteristics of the model examples refer to `references/ideal-examples.md`, as needed.
 
-## 執行足について
+## About the execution timeframe
 
-- 基本の執行足は**5分足**。ただし**1分足・1h足でエントリーすることもある**。
-- 執行足が1hの場合も、このスキルの評価基準(観察5要素・評価8要素・採点表)を**そのまま1hに適用**して評価する。タイムフレーム不一致の注記は不要。
-- STEP 0(上位足フィルター)の参照足は、1分足・5分足エントリー時は15m・1h、**1hエントリー時は4h・日足**。言及する際はこの読み替えを使う。
+- The default execution timeframe is **5m**. However, **entries are also made on 1m and 1h**.
+- When the execution timeframe is 1h, **apply this skill's criteria (5 observation elements, 8 evaluation elements, scoring tables) to 1h as is**. No note about a timeframe mismatch is needed.
+- The reference timeframes for STEP 0 (higher-timeframe filter) are 15m and 1h for 1m/5m entries, and **4h and daily for 1h entries**. Use this mapping when mentioning them.
 
-## 入力チャートの読み取り規約
+## Conventions for reading the input chart
 
-評価対象としてユーザーが与えるチャート画像(TradingView)は、模範画像と配色が異なる。以下の規約で読む:
+The chart images (TradingView) the user provides for evaluation use a different color scheme from the model images. Read them according to the following conventions:
 
-- **緑のローソク = 陽線、黒のローソク = 陰線**
-- **濃い青 = 200EMA、薄い青 = 20EMA**
-- **黒の斜め直線 = 切り下げ/切り上げライン**(評価対象)
-- **緑/赤のボックス**: 境目が建値、赤側がSL、緑側がTP(模範画像と同じ)
-- **緑の垂直線 = ゴールデンクロス発生地点、オレンジの垂直線 = デッドクロス発生地点**(STEP 1の方向感確定の目印)
-- **緑の丸印 = ゴールデンクロス後の初回の20EMAタッチおよび初回の200EMAタッチ**。オレンジの丸印 = デッドクロス後の同様の初回タッチ(STEP 2の目印)
-- **灰色の水平線・横長ボックス = 上位足のAOI**。執行足のライン評価には無関係なので無視する
-- 画面右上の時間足パネル(15m/1h/4h/D等の矢印)は、**各時間足のゴールデン/デッドクロス状態**を示す。これは「方向感」の情報であり、STEP 0が要求する「200EMAの傾き」とは別物である点に注意。参考情報として言及はしてよいが、採点には含めない
+- **Green candles = bullish, black candles = bearish**
+- **Dark blue = 200EMA, light blue = 20EMA**
+- **Black diagonal straight line = the descending/ascending line** (the subject of evaluation)
+- **Green/red box**: the boundary is the entry price, the red side is the SL and the green side is the TP (same as the model images)
+- **Green vertical line = where a golden cross occurred; orange vertical line = where a dead cross occurred** (the marker that fixes the directional bias in STEP 1)
+- **Green circle = the first 20EMA touch and the first 200EMA touch after a golden cross**. Orange circle = the same first touches after a dead cross (the marker for STEP 2)
+- **Gray horizontal lines / wide boxes = higher-timeframe AOI**. Irrelevant to the execution-timeframe line evaluation; ignore them
+- The timeframe panel at the top right of the screen (arrows for 15m/1h/4h/D, etc.) shows **the golden/dead cross state of each timeframe**. Note that this is "directional bias" information and is different from the "200EMA slope" that STEP 0 requires. It may be mentioned as reference information but is not included in scoring
 
-## 評価ワークフロー
+## Evaluation workflow
 
-### 観察フェーズ(固定5要素)
+### Observation phase (fixed 5 elements)
 
-採点の前に、必ず以下の5要素を抽出して言語化する。分析もアウトプットも常にこの5要素で行う。
+Before scoring, always extract and put into words the following 5 elements. Both analysis and output are always done in terms of these 5 elements.
 
-| 要素 | 抽出する内容 |
+| Element | What to extract |
 |---|---|
-| ① 推進波 | 方向/時間幅/値幅/EMAクロスの有無(=N計算・規模比較の基準) |
-| ② 調整波 | 起点(推進波の終点ピボット)/時間幅/戻しの深さ/200EMA到達の有無 |
-| ③ ピボット | 調整波内で認定したスイング高安値の列挙(認定基準: 調整幅の3割以上の押し/戻りを伴う) |
-| ④ ライン | 起点の位置/経由ピボット数/価格の反応回数(タッチ→反発) |
-| ⑤ EMA関係 | 執行足200EMAの傾き/タッチ印(丸)の位置/ラインとEMA間のスクイーズ(確定要件を満たすか)/接触ゾーンの本数/**200EMA反応の質(反発・中間・張り付き・未確定)** |
+| ① Impulse wave | Direction / duration / price range / presence of an EMA cross (= the basis for the N calculation and scale comparison) |
+| ② Corrective wave | Origin (the end pivot of the impulse wave) / duration / retracement depth / whether it reached the 200EMA |
+| ③ Pivots | List of swing highs/lows recognized within the corrective wave (recognition criterion: accompanied by a pullback/bounce of at least 30% of the correction range) |
+| ④ Line | Location of the origin / number of pivots it passes through / number of price reactions (touch → bounce) |
+| ⑤ EMA relationship | Slope of the execution-timeframe 200EMA / location of the touch markers (circles) / squeeze between the line and the EMA (whether the confirmation requirements are met) / number of candles in the contact zone / **quality of the 200EMA reaction (bounce, intermediate, clinging, undetermined)** |
 
-### 採点フェーズ
+### Scoring phase
 
-各軸は4つの固定要素で判定する。要素ごとに **○(明確に満たす)/△(部分的・確認不足)/×(不適合)** を付け、軸スコアは換算表で決める。
+Each axis is judged on 4 fixed elements. Mark each element **○ (clearly met) / △ (partial / insufficiently confirmed) / × (not met)**, and determine the axis score with the conversion table.
 
-## 軸1: スイング明確性(波動構造の質)
+## Axis 1: Swing clarity (quality of the wave structure)
 
-「この戻りは本物の調整か、ビルドアップか」を判定する軸。
+The axis that judges "is this pullback a genuine correction, or a build-up?"
 
-| 記号 | 要素 | ○の基準 | ×の典型 |
+| Key | Element | ○ criterion | Typical × |
 |---|---|---|---|
-| S1 | 波動リズム | 調整波が押し/戻りを伴う明確な波動を形成(ジリ・レンジでない) | ローソクが重なり続けるジリ下げ/上げ、レンジ |
-| S2 | ピボット反応 | ラインが反応済みピボット2点以上を結ぶ(3点目の反応まであれば文句なし) | 価格が一度も反応していない、実質1ピボット |
-| S3 | 反転構造 | ピボットが名前のつく反転構造(ダブルトップ/ボトム、三尊)を構成 | 構造が認定できない |
-| S4 | 一意性 | 他に同等に妥当なラインがほぼ引けない | 同等のラインが3本引ける、クラスターの真ん中を通したくなる |
+| S1 | Wave rhythm | The corrective wave forms clear waves with pullbacks/bounces (not a grind or a range) | A slow grind down/up with candles continually overlapping, or a range |
+| S2 | Pivot reaction | The line connects 2 or more pivots that have reacted (flawless if there is a reaction at a 3rd point) | Price has never reacted; effectively 1 pivot |
+| S3 | Reversal structure | The pivots form a named reversal structure (double top/bottom, head and shoulders) | No structure can be recognized |
+| S4 | Uniqueness | Almost no other equally valid line can be drawn | Three equivalent lines can be drawn; tempted to draw through the middle of a cluster |
 
-**中核要素はS1とS2**。どちらかが×なら軸1は自動的に2以下。
+**The core elements are S1 and S2.** If either is ×, Axis 1 is automatically 2 or lower.
 
-## 軸2: 角度・規模適合性
+## Axis 2: Angle and scale fit
 
-「このラインの規模は、いま狙っている動きの規模とマッチしているか」を判定する軸。
+The axis that judges "does the scale of this line match the scale of the move we are aiming for?"
 
-| 記号 | 要素 | ○の基準 | ×の典型 |
+| Key | Element | ○ criterion | Typical × |
 |---|---|---|---|
-| K1 | 起点一致(全体性) | ラインの起点が調整波の起点(推進波の終点ピボット)にあり、調整**全体**を覆っている | 調整の途中・末端から始まり、最後の加速したサブ波動だけを捉えている |
-| K2 | 相対傾斜 | ラインの傾きが直前の推進波の傾きより**明確に緩やか**(調整は推進より遅い) | 推進並み〜それ以上の急傾斜(規模ミスマッチ、または逆方向の推進の疑い) |
-| K3 | 規模の充足 | 調整が複数スイングを含むだけの時間・本数をかけて発達しており、**かつ戻りが推進波の起点を超えていない**(トレンド否定でない) | 数本のローソクしか含まない極小ライン。**または戻りが推進波の起点を明確に超え(higher high/lower low)、調整がトレンド否定に変質** |
-| K4 | ブレイク位置 | **戻し率 r ≤ 0.33**(調整レンジ下1/3でブレイク=EMA反発の近傍) | **r > 0.50**(調整の上半分でブレイク=反発でなく戻りを買っており、EMAから乖離・SL遠い)※判定は下記「K4の客観判定」に従う |
+| K1 | Origin match (wholeness) | The line's origin is at the origin of the corrective wave (the end pivot of the impulse wave) and it covers the **whole** correction | Starts in the middle or at the tail of the correction and captures only the final accelerating sub-wave |
+| K2 | Relative slope | The line's slope is **clearly gentler** than the slope of the preceding impulse wave (corrections are slower than impulses) | As steep as or steeper than the impulse (scale mismatch, or suspicion of an impulse in the opposite direction) |
+| K3 | Sufficient scale | The correction has developed over enough time / candles to contain multiple swings, **and the pullback has not gone beyond the origin of the impulse wave** (not a trend negation) | A tiny line containing only a few candles. **Or the pullback clearly exceeds the origin of the impulse wave (higher high/lower low) and the correction has turned into a trend negation** |
+| K4 | Break location | **Retracement ratio r ≤ 0.33** (break in the lower 1/3 of the correction range = near the EMA bounce) | **r > 0.50** (break in the upper half of the correction = buying the pullback rather than the bounce; far from the EMA, SL far away) *Judge per "Objective judgment of K4" below |
 
-**中核要素はK1とK2**。どちらかが×なら軸2は自動的に2以下。
+**The core elements are K1 and K2.** If either is ×, Axis 2 is automatically 2 or lower.
 
-**重要な注意**:
-- **調整波の形成時間が推進波より長いのは正常であり、減点しない**。推進は速く、調整は遅い — むしろ時間をかけた調整は本物の調整の特徴。模範例でも調整時間が推進と同等〜それ以上のケースが多い。
-- 角度は画像の縦横比に依存するため、絶対角度(○○度)では判定しない。**常に直前の推進波の傾きとの相対比較**で判定する(K2)。
-- 「急角度」の本質は速度ではなく**規模のミスマッチ**: ラインが調整全体ではなく小さすぎるサブ波動に基づいている、ということ(K1とK2は同じ病理の二つの現れ)。
+**Important notes**:
+- **It is normal for the corrective wave to take longer to form than the impulse wave; do not deduct for it.** Impulses are fast and corrections are slow — if anything, a correction that takes time is a hallmark of a genuine correction. In the model examples too, the correction often takes as long as or longer than the impulse.
+- Angle depends on the aspect ratio of the image, so do not judge by absolute angle (XX degrees). **Always judge by relative comparison with the slope of the preceding impulse wave** (K2).
+- The essence of "steep" is not speed but **scale mismatch**: the line is based on a sub-wave that is too small rather than on the whole correction (K1 and K2 are two manifestations of the same pathology).
 
-**「戻しの深さ」と「トレンド否定」を混同しない(★誤評価の再発防止)**:
-- **戻しの深さ**は `戻り幅 ÷ 直前推進波の値幅` の%で測る**記述指標**であり、**参照は必ず「直前の推進波」**。何に対して深いのかを明示せずに「深い」と書かない。調整は**50〜78%戻すのが正常**で、**深いこと単独では減点しない**。観察②に%を書くだけに留め、K3の×にはしない。
-- **K3の×=トレンド否定**は、戻りが推進波の**起点を明確に超えた(higher high/lower low)**という**測定可能なイベント**でのみ認定する。「起点に近い」「深い」では×にしない。
-- **200EMAへの到達は本手法の前提(押し目の目的地)であり、それ自体は減点材料ではない。** 「EMAに到達した=深い/危険」は category error。深さは推進波に対する%で測り、EMA到達の有無とは切り離す。EMAでの危険は「深さ」ではなく「反応の質(R)」と「特則」で評価する。
+**Do not confuse "retracement depth" with "trend negation" (★ preventing recurrence of misjudgment)**:
+- **Retracement depth** is a **descriptive metric** measured as `pullback size ÷ price range of the preceding impulse wave` in %, and **its reference is always "the preceding impulse wave."** Do not write "deep" without stating what it is deep relative to. **A 50–78% retracement is normal** for a correction, and **depth alone is not a deduction**. Just write the % in Observation ②; do not make it × on K3.
+- **K3 × = trend negation** is recognized only by the **measurable event** that the pullback **clearly exceeded the origin of the impulse wave (higher high/lower low)**. "Close to the origin" or "deep" is not ×.
+- **Reaching the 200EMA is a premise of this strategy (the destination of the pullback) and is not in itself a deduction.** "It reached the EMA = deep/dangerous" is a category error. Measure depth as a % of the impulse wave, separately from whether the EMA was reached. Danger at the EMA is evaluated by the "quality of the reaction (R)" and the "special rule," not by "depth."
 
-### K4(ブレイク位置)の客観判定
+### Objective judgment of K4 (break location)
 
-K4は「ブレイクが200EMAタッチ近傍か」を、主観の「近い/遠い」ではなく**調整波の規模で正規化した位置**で判定する。目的は、ブレイク=200EMA反発をタッチ近傍で捉えてSL(調整の最終高安値)が近く、RRRが1:1〜1:3に収まること。「同じ調整構造の中でのブレイク」を「タッチ近傍」と取り違えないための定量化(過去の誤判定の再発防止)。
+K4 judges "is the break near the 200EMA touch?" not by subjective "near/far" but by **position normalized by the scale of the corrective wave**. The aim is to catch the break = 200EMA bounce near the touch, so that the SL (the final high/low of the correction) is close and the RRR stays within 1:1–1:3. This quantification prevents mistaking "a break within the same corrective structure" for "near the touch" (preventing recurrence of past misjudgments).
 
-**測る4点(ロング。ショートは上下反転):**
+**The 4 points to measure (long; invert for short):**
 
-| 記号 | 内容 |
+| Key | Meaning |
 |---|---|
-| A | 調整の起点(推進波の終点ピボット=ロングなら高値) |
-| B | 調整の極値(200EMAタッチの安値=SLアンカー。ロング) |
-| E | ブレイク時点の200EMA値 |
-| X | ブレイク価格(=建値) |
-| R | \|A − B\| = 調整レンジ幅(正規化の分母) |
+| A | Origin of the correction (end pivot of the impulse wave = the high, for a long) |
+| B | Extreme of the correction (the low of the 200EMA touch = SL anchor, for a long) |
+| E | 200EMA value at the time of the break |
+| X | Break price (= entry price) |
+| R | \|A − B\| = width of the correction range (the normalizing denominator) |
 
-**主指標:戻し率 r** = ブレイク時点で調整レンジの何割を戻し終えているか。
-- ロング: `r = (X − B) / R`  /  ショート: `r = (B − X) / R`
+**Primary metric: retracement ratio r** = what fraction of the correction range has already been retraced at the time of the break.
+- Long: `r = (X − B) / R`  /  Short: `r = (B − X) / R`
 
-| r | K4 | 意味 |
+| r | K4 | Meaning |
 |---|---|---|
-| r ≤ 0.33 | ○ | 調整レンジ下1/3でブレイク。EMA反発の近傍、SLが近い(模範例の実測 r≈0.29〜0.33) |
-| 0.33 < r ≤ 0.50 | △ | 下半分だが中央寄り。やや遅く、RRは劣化するが許容圏 |
-| r > 0.50 | × | 調整の上半分でブレイク。反発でなく「戻り」を買っており、EMAから乖離・SL遠い |
+| r ≤ 0.33 | ○ | Break in the lower 1/3 of the correction range. Near the EMA bounce, SL is close (measured on model examples: r≈0.29–0.33) |
+| 0.33 < r ≤ 0.50 | △ | Lower half but toward the middle. Somewhat late; RR degrades but is acceptable |
+| r > 0.50 | × | Break in the upper half of the correction. Buying the "pullback" rather than the bounce; far from the EMA, SL far away |
 
-**副指標:EMA乖離率 g** = `\|X − E\| / R`。g ≤ 0.20 は○を補強、g > 0.40 は×を補強。
+**Secondary metric: EMA deviation ratio g** = `\|X − E\| / R`. g ≤ 0.20 reinforces ○; g > 0.40 reinforces ×.
 
-**RR交差確認**: SLをBの少し外、TPを推進波のN計算値に置いたRRRが1:1未満に落ちるなら、rの判定に関わらずK4は×(エントリーが遅すぎて優位性が消えている)。RRRが範囲内でも、rが高い(=遅い)ほどRRは1:1側に圧縮される点を補足に記す。
+**RR cross-check**: If the RRR with the SL slightly beyond B and the TP at the impulse wave's N-calculation value falls below 1:1, K4 is × regardless of r (the entry is too late and the edge is gone). Even if the RRR is within range, note in the supplement that the higher r is (= later), the more the RR is compressed toward 1:1.
 
-**境界処理**: rがバンド境界の±0.05以内なら、副指標gとRRRで決める。角度の絶対値ではなく常にこの正規化指標で判定する(画像の縦横比に依存しないため)。チャート画像からA/B/E/Xは概算でよいが、観察⑤・④で読んだ値と矛盾しないこと。
+**Boundary handling**: If r is within ±0.05 of a band boundary, decide using the secondary metric g and the RRR. Always judge by this normalized metric rather than the absolute angle (because it does not depend on the image's aspect ratio). A/B/E/X may be approximated from the chart image, but must not contradict the values read in Observations ⑤ and ④.
 
-## 軸スコア換算表(両軸共通)
+## Axis score conversion table (common to both axes)
 
-| 軸スコア | 要素の状態 |
+| Axis score | State of elements |
 |---|---|
-| 5 | 4要素すべて○ |
-| 4 | ○3つ + △1つ(×なし) |
-| 3 | ○2つ + △2つ(×なし)、**または 非中核(S3/S4・K3/K4)の×が1つだけ**(他に×なし。△の有無に関わらず3に留める) |
-| 2 | **中核要素(S1/S2・K1/K2)の×が1つ**(他に×なし) |
-| 1 | ×が2つ以上、または無理引き・完全なレンジ該当 |
+| 5 | All 4 elements ○ |
+| 4 | Three ○ + one △ (no ×) |
+| 3 | Two ○ + two △ (no ×), **or exactly one × on a non-core element (S3/S4, K3/K4)** (no other ×; stays at 3 regardless of △) |
+| 2 | **One × on a core element (S1/S2, K1/K2)** (no other ×) |
+| 1 | Two or more ×, or a forced line / a complete range |
 
-判定は上から順に、最初に該当した行を採る。× の扱いは**どの要素が×か**で分岐する点に注意:
-- **中核(S1/S2・K1/K2)の単独× → 2**(土台が崩れているため見送り推奨へ落とす)。
-- **非中核(S3/S4・K3/K4)の単独× → 3**(質を上げる要素の欠落に留まるため、要注意で留める。同時に△があっても3より下げない)。
-- **×が2つ以上 → 1**(中核・非中核を問わず)。
+Judge from the top and take the first row that applies. Note that the handling of × branches on **which element is ×**:
+- **A single × on a core element (S1/S2, K1/K2) → 2** (the foundation is broken, so drop to "skip recommended").
+- **A single × on a non-core element (S3/S4, K3/K4) → 3** (only an element that raises quality is missing, so keep it at "caution." Do not drop below 3 even if there are also △).
+- **Two or more × → 1** (regardless of core or non-core).
 
-迷ったら低い方に倒す(手法自体が「見送り条件1つで入らない」保守設計のため)。
+When in doubt, err toward the lower score (because the strategy itself is designed conservatively: "do not enter if even one skip condition applies").
 
-## 総合評価
+## Overall evaluation
 
-総合点は**2軸の低い方を上限**とする(ゲート方式)。
+The overall score is **capped at the lower of the two axes** (gate method).
 
-| 総合 | 判定 | 意味 |
+| Overall | Verdict | Meaning |
 |---|---|---|
-| 5 | エントリー適格(模範級) | 模範例と同等。STEP 0通過済みなら執行してよい形 |
-| 4 | エントリー適格(標準) | 有効なライン。サイズ管理を通常通り行い執行可 |
-| 3 | 要注意 | 形は成立しているが弱点あり。追加確認(3点目の反応待ち、反転構造の完成待ち)を推奨 |
-| 2 | 見送り推奨 | 手法の見送り条件に実質該当。入らない |
-| 1 | 見送り(明確な罠) | ビルドアップ/スクイーズ/無理引き。2〜5月型の負けパターン |
+| 5 | Entry Qualified (Exemplary) | Equivalent to the model examples. A shape that may be executed if STEP 0 has been passed |
+| 4 | Entry Qualified (Standard) | A valid line. Can be executed with normal position sizing |
+| 3 | Caution | The shape holds but has weaknesses. Additional confirmation recommended (wait for a 3rd-point reaction, wait for the reversal structure to complete) |
+| 2 | Skip Recommended | Effectively meets the strategy's skip conditions. Do not enter |
+| 1 | Skip (Clear Trap) | Build-up / squeeze / forced line. The losing pattern of February–May |
 
-### 特則(200EMA警戒制限)の発動原則 ★最重要・誤評価の再発防止
+### Principle for invoking the special rule (200EMA warning cap) ★ Most important — preventing recurrence of misjudgment
 
-特則は総合を上限2に縛る**ハードキャップ**である。ハードキャップは軸の○/△/×採点とは扱いが根本的に異なる:
+The special rule is a **hard cap** that limits the overall score to a maximum of 2. A hard cap is handled fundamentally differently from the ○/△/× scoring of the axes:
 
-- **軸採点は「迷ったら低い方」でよい**(保守設計)。だが**特則は「迷ったら発動しない」**。総合を強制的に2へ落とす以上、客観シグナルが**明示的に満たされた(陽性確認できた)場合のみ**発動する。
-- **「〜気味」「〜寄り」「収束方向」「形成途上」といった未確定の印象では絶対に発動しない。** これらは特則ではなく「要注意(3)・確認待ち」へ落とす。
-- 特則は「悪いパターンが**起きていることの確認**」であって、「起きるかもしれないという予感」ではない。予感は軸2/観察の補足に書き、点数を縛らない。
+- **For axis scoring, "when in doubt, go lower" is fine** (conservative design). But **for the special rule, "when in doubt, do not invoke it."** Because it forcibly drops the overall score to 2, invoke it **only when the objective signal is explicitly satisfied (positively confirmed)**.
+- **Never invoke it on undetermined impressions such as "-ish," "leaning toward," "converging," or "forming."** Those drop to "Caution (3) / awaiting confirmation," not to the special rule.
+- The special rule is "**confirmation that** a bad pattern **is happening**," not "a hunch that it might happen." Write hunches in the Axis 2 / observation supplement, and do not let them cap the score.
 
-**観察⑤で次のいずれかが下記の発達要件を満たして確認できた場合のみ**、軸の点数に関わらず総合を最大2に制限する(手法の「最大の警戒点」=反発がブレイクに化けるケースに直結するため)。
+**Only when one of the following is confirmed in Observation ⑤ and meets the development requirements below**, cap the overall score at 2 regardless of the axis scores (because it is directly linked to the strategy's "biggest warning point" = a bounce turning into a break).
 
-1. **スクイーズ(確定要件)**: 以下を**すべて**満たす。
-   - ラインと200EMAが収束している(収束ウェッジ)、**かつ**
-   - 価格がそのウェッジ内部で**3本以上**揉み合い、各足のレンジ(実体+ヒゲ)が縮小している(ボラ収縮)、**かつ**
-   - 価格がウェッジの**両境界(ライン側とEMA側)に交互に触れている**(片側だけ・頂点に到達しただけは不可)。
-   - → これらが揃わず、幾何学的に収束しているだけ/頂点に到達しただけの段階は **「形成途上=非該当(監視)」**。特則は発動しない。
-2. **EMA張り付き(ビルドアップ)**: 下記「200EMA反応の質(R)」で**×=張り付きと陽性確認**された場合のみ(接触ゾーンが有効本数に達し、c≥3 または a≤0.15)。**未確定(到達直後・接触1〜2本)は発動しない。**
+1. **Squeeze (confirmation requirements)**: **all** of the following are met.
+   - The line and the 200EMA are converging (converging wedge), **and**
+   - Price has chopped inside that wedge for **3 or more** candles with each candle's range (body + wicks) shrinking (volatility contraction), **and**
+   - Price is **alternately touching both boundaries of the wedge (line side and EMA side)** (touching only one side, or merely reaching the apex, does not count).
+   - → A stage where these are not all met and it is merely geometrically converging / has merely reached the apex is **"forming = not applicable (monitor)."** The special rule is not invoked.
+2. **Clinging to the EMA (build-up)**: Only when **positively confirmed as × = clinging** in "Quality of the 200EMA reaction (R)" below (the contact zone has reached the valid number of candles, and c≥3 or a≤0.15). **Do not invoke it when undetermined (just reached, 1–2 contact candles).**
 
-**特則を発動する前に必ず自問する(3問すべてYESでなければ非該当)**:
-- Q1: その判断は「測定できた客観事実」か、それとも「起こりそうという予感」か? → 予感なら非該当。
-- Q2: 接触ゾーン(またはウェッジ内)に**3本以上**のデータがあるか? → 1〜2本なら測定不能=未確定=非該当。
-- Q3: 自分の文章に「気味」「寄り」「収束方向」「途上」と書いていないか? → 書いているなら、それは未確定であり特則ではない。要注意(3)へ落とす。
+**Before invoking the special rule, always ask yourself (if not all 3 are YES, it does not apply)**:
+- Q1: Is that judgment a "measured objective fact," or a "hunch that it is likely to happen"? → If it is a hunch, it does not apply.
+- Q2: Is there data from **3 or more** candles in the contact zone (or inside the wedge)? → If only 1–2 candles, it is unmeasurable = undetermined = not applicable.
+- Q3: Have I written "-ish," "leaning toward," "converging," or "forming" in my text? → If so, it is undetermined and not the special rule. Drop to Caution (3).
 
-### 200EMA反応の質(R)の客観判定
+### Objective judgment of the quality of the 200EMA reaction (R)
 
-価格が200EMAにどう反応したかを、「跳ねて離れる反発」か「EMAに張り付くビルドアップ」か、**または到達直後でまだ判定できない未確定か**で分類する。**反発はエントリーの確認材料、張り付きはブレイクが200EMA割れ(=SL方向)に化ける前兆**であり、両者を値動きの性質で区別する(模範例:反発はEMAから振幅を持って離脱・ダブル構造を形成/2025年4月末の負け例:フラットEMAを往復しながら収縮)。
+Classify how price reacted to the 200EMA: a "bounce that springs away," a "build-up that clings to the EMA," **or undetermined because it has only just arrived and cannot yet be judged**. **A bounce is confirming evidence for the entry; clinging is a precursor of the break turning into a 200EMA break (= toward the SL)**, and the two are distinguished by the character of the price action (model examples: a bounce leaves the EMA with amplitude and forms a double structure / the losing example at the end of April 2025: oscillating back and forth across a flat EMA while contracting).
 
-**接触ゾーン**: 価格が200EMAに到達した最初の足から、ラインブレイクの足まで。
+**Contact zone**: from the first candle in which price reached the 200EMA until the line-break candle.
 
-**接触ゾーンの有効本数(★ゲート)**: c も a も「EMAに対する複数本の振る舞い」を測る指標なので、接触ゾーンが短すぎると測定が成立しない。**接触ゾーンが3本未満(到達がほぼ最終足・タッチ1〜2本)の場合、c・a は測定不能であり、R は自動的に「未確定」とする。** この場合、張り付きにも反発にも分類してはならない(=「張り付き気味」「反発気味」と書かない)。これは200EMAタッチと同時にラインブレイクが起きる本手法では頻出の状態である(エントリートリガーが反応の解決前に来るため)。
+**Valid number of candles in the contact zone (★ gate)**: Both c and a measure "the behavior of multiple candles relative to the EMA," so if the contact zone is too short, the measurement does not hold. **If the contact zone has fewer than 3 candles (arrival is almost on the last candle, 1–2 touches), c and a are unmeasurable, and R is automatically "undetermined."** In this case, do not classify it as either clinging or bounce (= do not write "clinging-ish" or "bounce-ish"). This is a frequent state in this strategy, where the line break occurs at the same time as the 200EMA touch (because the entry trigger comes before the reaction resolves).
 
-**3つの客観シグナル(接触ゾーン3本以上のときのみ測定):**
+**3 objective signals (measured only when the contact zone has 3 or more candles):**
 
-| シグナル | 反発(良)寄り | 張り付き(危険)寄り |
+| Signal | Toward bounce (good) | Toward clinging (dangerous) |
 |---|---|---|
-| クロス回数 c(終値が200EMAを跨いだ符号反転の回数) | c ≤ 1(片側で反応して離脱) | c ≥ 3(EMAを挟んで往復) |
-| 離脱幅 a(タッチ後3〜5本でEMAから離れた最大幅 ÷ 調整レンジR) | a ≥ 0.30(振幅を伴い跳ねた) | a ≤ 0.15(EMA直上に留まる) |
-| 足の収縮/EMA傾き | 明確な拒否足あり・EMAに傾きあり | 実体/ヒゲが収縮・EMAがフラット |
+| Cross count c (number of sign changes where the close crossed the 200EMA) | c ≤ 1 (reacted on one side and left) | c ≥ 3 (oscillating across the EMA) |
+| Departure size a (maximum distance from the EMA within 3–5 candles after the touch ÷ correction range R) | a ≥ 0.30 (sprang away with amplitude) | a ≤ 0.15 (stays right on the EMA) |
+| Candle contraction / EMA slope | Clear rejection candle, EMA has a slope | Bodies/wicks contracting, EMA flat |
 
-**判定(4分類):**
-- **未確定(接触1〜2本・到達直後)**: c/a が測定不能。**特則トリガー2は発動しない。** 観察⑤に「反応未確定(到達直後)」と明記し、総合評価の主因に「反応未確定=確認待ち」として反映する(ゲートに従い多くは要注意=3。ハードキャップはしない)。
-- **反発(○・確認材料)**: 接触ゾーン3本以上 かつ c ≤ 1 かつ a ≥ 0.30。S3(反転構造)を補強。ペナルティなし。
-- **張り付き(×・特則発動)**: 接触ゾーン3本以上 かつ(c ≥ 3 または a ≤ 0.15)。**特則トリガー2 → 総合上限2**。
-- **中間(△・要注意)**: 接触ゾーン3本以上だが上記の反発・張り付きのどちらにも確定しない。ハードキャップはせず補足に明記し、他の弱点と合算する。
+**Judgment (4 categories):**
+- **Undetermined (1–2 contact candles, just arrived)**: c/a are unmeasurable. **Special-rule trigger 2 is not invoked.** State "reaction undetermined (just arrived)" in Observation ⑤, and reflect it in the main cause of the overall evaluation as "reaction undetermined = awaiting confirmation" (per the gate, usually Caution = 3. No hard cap).
+- **Bounce (○, confirming evidence)**: contact zone of 3 or more candles and c ≤ 1 and a ≥ 0.30. Reinforces S3 (reversal structure). No penalty.
+- **Clinging (×, special rule invoked)**: contact zone of 3 or more candles and (c ≥ 3 or a ≤ 0.15). **Special-rule trigger 2 → overall capped at 2**.
+- **Intermediate (△, caution)**: contact zone of 3 or more candles but not confirmed as either bounce or clinging above. No hard cap; state it in the supplement and combine it with other weaknesses.
 
-**重要(早期到達の扱い)**: 「未確定」を「張り付き寄り」へ寄せて特則を発動させるのは誤り(本会話のGBPAUDで実際に起きた誤評価)。未確定は不利材料ではあるが**確認待ち**であって、確定した罠ではない。罠として2に縛るには張り付きの陽性確認が要る。
+**Important (handling of early arrival)**: Pushing "undetermined" toward "leaning toward clinging" and invoking the special rule is a mistake (a misjudgment that actually happened with GBPAUD in a past session). Undetermined is an unfavorable factor but is **awaiting confirmation**, not a confirmed trap. Capping at 2 as a trap requires positive confirmation of clinging.
 
-**注**: 張り付きは多くの場合S1(波動リズム)も×になるが、調整全体にスイングがあって**最終接近だけ**EMA張り付きの場合はS1で拾えない。本判定はその抜けを埋める専用フィルター。境界はEMA傾き(フラット=張り付き補強)で決める。
+**Note**: Clinging often makes S1 (wave rhythm) × as well, but when the whole correction has swings and **only the final approach** clings to the EMA, S1 cannot catch it. This judgment is a dedicated filter that fills that gap. The boundary is decided by the EMA slope (flat = reinforces clinging).
 
-## 出力フォーマット(厳守・逸脱禁止)
+## Output format (strict; no deviation)
 
-**評価結果の出力先がチャットでもNotionでも、必ず下記テンプレートと完全に同一の構成・見出し・表構造で出力する。** 出力先によって形式を変えること、表を箇条書きに置き換えること、セクションを統合・省略・並べ替えることはすべて禁止。
+**Whether the evaluation result goes to chat or to Notion, always use exactly the same structure, headings and table layout as the template below.** Changing the format by destination, replacing tables with bullet points, and merging, omitting or reordering sections are all prohibited.
 
-必須ルール:
-1. **観察は必ず5行の表**(①〜⑤)。箇条書き・太字ラベル付き段落への置き換えは禁止。
-2. **軸1・軸2は必ず各4行の表**(S1〜S4 / K1〜K4)。見出しに「— X/5」のスコアを必ず含める。
-3. 各軸の表の直後に**補足2〜3行**(文章)を置く。
-4. 表の「読み取り」「根拠」欄は一言〜短文(目安15〜40字)。長文解説は補足に回す。
-5. 末尾は「### 総合評価 — X/5(判定ラベル)」+ **判定根拠の4行固定表**(ゲート/特則/主因/STEP 0)で締める。総合**3以下のときだけ**、その直後に **改善提案の表**(弱点→改善トリガー)を置く。4以上のときは改善提案セクションを出さない。
-   - 判定ラベルは換算表の固定5種(`適格(模範級)`/`適格(標準)`/`要注意`/`見送り推奨`/`見送り(明確な罠)`)から選ぶ。
-   - 総合評価に散文の段落を書かない。他ペアとの比較・前置き・経緯説明などの冗長な記述は禁止(必要な要点は「主因」欄に一言で収める)。
-   - 改善提案は**採点で△/×だった要素ごとに1行**(点数を縛った要素を優先、最大3行)。①②③等の独自採番や自由記述の箇条書きにしない。
-   - 「結論」「見送り判断」など別名の独自セクションを追加しない。
-6. 方向(ロング/ショート、ライン種別)は「## ライン評価結果」直後の1行に書く。
-7. Notion書き込み時に1行追加してよいのは末尾の評価日スタンプ(例: `*評価日: YYYY-MM-DD / 200EMA手法 ライン評価*`)のみ。
+Required rules:
+1. **Observations are always a 5-row table** (①–⑤). Replacing it with bullet points or paragraphs with bold labels is prohibited.
+2. **Axis 1 and Axis 2 are always 4-row tables each** (S1–S4 / K1–K4). The heading must include the score "— X/5".
+3. Place **2–3 lines of supplementary notes** (prose) right after each axis table.
+4. The "Reading" and "Basis" columns are a word to a short sentence (about 15–40 characters as a guide). Put long explanations in the supplement.
+5. End with "### Overall Evaluation — X/5 (verdict label)" + the **fixed 4-row basis table** (Gate / Special rule / Main cause / STEP 0). **Only when the overall is 3 or lower**, place an **improvements table** (weakness → improvement trigger) right after it. Do not output the improvements section when it is 4 or higher.
+   - Choose the verdict label from the fixed 5 in the conversion table (`Qualified (Exemplary)` / `Qualified (Standard)` / `Caution` / `Skip Recommended` / `Skip (Clear Trap)`).
+   - Do not write prose paragraphs in the overall evaluation. Verbose content such as comparisons with other pairs, preambles or background explanations is prohibited (fit the necessary point into the "Main cause" column in one line).
+   - Improvements are **one row per element that was △/× in scoring** (prioritize the elements that capped the score, max 3 rows). Do not use your own numbering like ①②③ or free-form bullet points.
+   - Do not add your own sections under other names such as "Conclusion" or "Skip decision."
+6. Write the direction (long/short, line type) in one line right after "## Line Evaluation Result".
+7. The only line you may add when writing to Notion is an evaluation-date stamp at the end (e.g. `*Evaluated: YYYY-MM-DD / 200EMA strategy line evaluation*`).
 
 ```
-## ライン評価結果
-方向: (ロング/ショート、切り下げ/切り上げライン、クロス種別)
+## Line Evaluation Result
+Direction: (Long/Short, descending/ascending line, cross type)
 
-### 観察
-| 要素 | 読み取り |
+### Observations
+| Element | Reading |
 |---|---|
-| ① 推進波 | (方向・時間幅・値幅・クロス) |
-| ② 調整波 | (起点・時間幅・戻し深さ・EMA到達) |
-| ③ ピボット | (認定したスイング高安値) |
-| ④ ライン | (起点・経由ピボット・反応回数) |
-| ⑤ EMA関係 | (傾き・タッチ印・接触本数・スクイーズ確定要件の可否・反応の質:反発/中間/張り付き/未確定) |
+| ① Impulse wave | (direction, duration, price range, cross) |
+| ② Corrective wave | (origin, duration, retracement depth, EMA reached) |
+| ③ Pivots | (recognized swing highs/lows) |
+| ④ Line | (origin, pivots passed through, number of reactions) |
+| ⑤ EMA relationship | (slope, touch markers, contact candles, whether squeeze confirmation requirements are met, reaction quality: bounce/intermediate/clinging/undetermined) |
 
-### 軸1: スイング明確性 — X/5
-| 要素 | 判定 | 根拠 |
+### Axis 1: Swing Clarity — X/5
+| Element | Mark | Basis |
 |---|---|---|
-| S1 波動リズム | ○/△/× | (一言) |
-| S2 ピボット反応 | ○/△/× | (一言) |
-| S3 反転構造 | ○/△/× | (一言) |
-| S4 一意性 | ○/△/× | (一言) |
+| S1 Wave rhythm | ○/△/× | (one line) |
+| S2 Pivot reaction | ○/△/× | (one line) |
+| S3 Reversal structure | ○/△/× | (one line) |
+| S4 Uniqueness | ○/△/× | (one line) |
 
-(補足2〜3行)
+(2–3 lines of supplementary notes)
 
-### 軸2: 角度・規模適合性 — X/5
-| 要素 | 判定 | 根拠 |
+### Axis 2: Angle & Scale Fit — X/5
+| Element | Mark | Basis |
 |---|---|---|
-| K1 起点一致 | ○/△/× | (一言) |
-| K2 相対傾斜 | ○/△/× | (一言) |
-| K3 規模の充足 | ○/△/× | (一言) |
-| K4 ブレイク位置 | ○/△/× | (一言) |
+| K1 Origin match | ○/△/× | (one line) |
+| K2 Relative slope | ○/△/× | (one line) |
+| K3 Sufficient scale | ○/△/× | (one line) |
+| K4 Break location | ○/△/× | (one line) |
 
-(補足2〜3行)
+(2–3 lines of supplementary notes)
 
-### 総合評価 — X/5(判定ラベル)
-| 判定根拠 | 内容 |
+### Overall Evaluation — X/5 (verdict label)
+| Basis | Content |
 |---|---|
-| ゲート | min(軸1 X, 軸2 Y)= Z |
-| 特則 | 200EMA警戒(スクイーズ/EMA張り付き)非該当(発動は陽性確認時のみ。未確定・形成途上は非該当。該当時のみ「該当 → 上限2」と種別を明記) |
-| 主因 | 総合点を縛った要素を一言(例: K4× = 200EMAから乖離した遅いブレイク) |
-| STEP 0 | 上位足傾きは画像外/参考(パネル: 15m… 1h… 4h… D…) |
+| Gate | min(Axis 1 X, Axis 2 Y) = Z |
+| Special rule | 200EMA warning (squeeze/EMA clinging) not applicable (invoked only on positive confirmation; undetermined or forming is not applicable. Only if it applies, state "applies → cap 2" with the type) |
+| Main cause | The element that capped the overall score, in one line (e.g. K4× = late break far from the 200EMA) |
+| STEP 0 | Higher-timeframe slope is outside the image / reference only (panel: 15m… 1h… 4h… D…) |
 
-**改善提案**(総合3以下のときのみ)
-| 弱点 | 改善トリガー |
+**Improvements** (only when overall is 3 or lower)
+| Weakness | Improvement trigger |
 |---|---|
-| (△/×だった要素と一言) | (どう待てば/どこに引けば○になるか、一言) |
+| (element that was △/× and one line) | (how to wait / where to draw so that it becomes ○, one line) |
 ```
 
-**総合評価・改善提案の書き方(統一形式)**:
-- 総合評価は上記**4行固定表**(ゲート/特則/主因/STEP 0)を毎回同じ順で出す。散文段落は書かない。
-  - ゲート: `min(軸1 X, 軸2 Y)= Z` の式だけ。
-  - 特則: スクイーズの該当/非該当を必ず明記(該当時のみ「→ 上限2」を付す)。
-  - 主因: 総合点を決めた**1要素**を15〜40字で。複数あっても最も拘束した1つに絞る。
-  - STEP 0: 画像から傾きが読めない旨と、右上パネルの参考値(クロス状態)を一言。
-- 改善提案は**採点で△/×だった要素**を行にし、各行「弱点 → 改善トリガー」で対応させる(点数を縛った要素を上から、最大3行)。総合4以上では出さない。
+**How to write the overall evaluation and improvements (unified format)**:
+- Output the overall evaluation as the **fixed 4-row table** above (Gate / Special rule / Main cause / STEP 0), in the same order every time. Do not write prose paragraphs.
+  - Gate: only the formula `min(Axis 1 X, Axis 2 Y) = Z`.
+  - Special rule: always state whether the squeeze applies or not (append "→ cap 2" only if it applies).
+  - Main cause: the **one element** that determined the overall score, in 15–40 characters. Even if there are several, narrow it to the single most constraining one.
+  - STEP 0: one line noting that the slope cannot be read from the image, and the reference values from the top-right panel (cross state).
+- Make each improvements row an **element that was △/× in scoring**, with "weakness → improvement trigger" per row (elements that capped the score first, max 3 rows). Do not output it for overall 4 or higher.
 
-### 過去に起きた形式逸脱(再発禁止の具体例)
+### Past format deviations (concrete examples never to repeat)
 
-あるSilverの評価で、Notion書き込み時に以下の逸脱が発生した。これらは禁止:
-- 冒頭に「**総合評価:1/5** — 方向: …」と総合を先頭に移動した(→ 総合は必ず最後のセクション)
-- 「### 観察」を表ではなく**太字ラベル付き箇条書き**で書いた(→ 必ず5行の表)
-- 「### 結論」「### 見送り判断」という**テンプレートにないセクション**を追加した(→ 総合評価セクションと改善提案に収める)
-- 軸の見出しスコア表記や補足の位置がチャット版と不一致だった(→ チャットとNotionは完全同一)
-- 総合評価を散文で長く書き、他ペアとの比較や経緯を盛り込んだ(→ 4行固定表のみ。要点は「主因」欄に一言)
-- 改善提案を①②③の自由記述で書いた(→ 「弱点 → 改善トリガー」表で、△/×要素ごとに1行)
+In an evaluation of silver, the following deviations occurred when writing to Notion. These are prohibited:
+- Moved the overall score to the top, as in "**Overall: 1/5** — Direction: …" (→ the overall is always the last section)
+- Wrote "### Observations" as **bullet points with bold labels** instead of a table (→ always a 5-row table)
+- Added **sections not in the template**, "### Conclusion" and "### Skip Decision" (→ fit them into the overall evaluation section and improvements)
+- The axis heading score notation and the position of the supplement did not match the chat version (→ chat and Notion are completely identical)
+- Wrote the overall evaluation as long prose including comparisons with other pairs and background (→ only the fixed 4-row table; the point goes in the "Main cause" column in one line)
+- Wrote improvements as free-form ①②③ text (→ a "weakness → improvement trigger" table, one row per △/× element)
 
-## 評価結果のNotionへの書き込み
+## Writing the evaluation result to Notion
 
-ユーザーが書き込み先のNotionページを指定した場合(例: 「6/7-6/12の中の1.USDCAD」)、評価結果を該当ページに書き込む。
+When the user specifies a destination Notion page (e.g. "1. USDCAD inside 6/7-6/12"), write the evaluation result to that page.
 
-手順:
-1. Notionの検索ツールで指定された親ページ/子ページを探す(Trading Journal → 週レンジ名 → 通貨ペア名の階層が典型)
-2. ページを取得し、**テンプレートに用意された「AI評価」見出しを探す。評価結果はその見出しの下に書き込む**。「AI評価」見出しが存在しない場合のみ、ページ末尾に「AI評価」見出しを作って書き込む
-3. 書き込む内容は**出力フォーマットのテンプレートと一字一句同じ構成**(方向行・観察表・軸1表+補足・軸2表+補足・総合評価・改善提案)。Notion用に再構成・要約・セクション追加をしない。末尾に評価日スタンプ1行のみ追加可
-4. チャットにも**同一の評価結果**を表示し、Notionへの書き込み完了を一言添える
+Steps:
+1. Find the specified parent/child page with the Notion search tool (the typical hierarchy is Trading Journal → week range name → currency pair name)
+2. Fetch the page and **look for the "AI Evaluation" heading provided by the template. Write the evaluation result under that heading.** Only if there is no "AI Evaluation" heading, create one at the end of the page and write there
+3. The content must have **exactly the same structure as the output-format template, word for word** (direction line, observations table, Axis 1 table + supplement, Axis 2 table + supplement, overall evaluation, improvements). Do not restructure, summarize, or add sections for Notion. Only a single evaluation-date stamp line may be added at the end
+4. Also show the **identical evaluation result** in the chat, with a short note that writing to Notion is complete
 
-ページが見つからない・複数候補がある場合は、書き込まずに候補をユーザーに確認する。
+If the page cannot be found or there are multiple candidates, do not write; confirm the candidates with the user.
 
-## Notionページからのチャート画像取得(ページ指定のみで評価するフロー)
+## Retrieving chart images from a Notion page (flow for evaluating with only a page specified)
 
-ユーザーがページ名だけを指定し、チャットに画像を添付していない場合は、ページから画像を取得して評価を試みる:
+When the user specifies only a page name and has not attached an image in the chat, try to retrieve the image from the page and evaluate:
 
-1. Notionのfetchツールで該当ページを取得する。ページの「## 執行足」セクション配下に執行足チャートの画像URL(`prod-files-secure.s3.us-west-2.amazonaws.com` の署名付きURL、有効期限1時間)が含まれる
-2. bashで `curl -s -o /home/claude/chart_exec.png "<画像URL>"` でダウンロードし、`file` コマンドでPNG/JPEGであることを確認する
-3. viewツールで画像を開いて評価を実施する
-4. 「## 上位足」セクションの画像も同様に取得できるが、評価対象はあくまで執行足のライン。上位足画像は文脈の参考言及にのみ使う
-5. ページ内のユーザー自身のメモ(エントリー判断の記述)が読める場合、評価本体はあくまで画像から独立に行い、評価後にユーザーの自己分析との一致/相違に触れてよい
+1. Fetch the page with the Notion fetch tool. Under the page's "## Execution TF" section is the image URL of the execution-timeframe chart (a signed URL on `prod-files-secure.s3.us-west-2.amazonaws.com`, valid for 1 hour)
+2. In bash, download it with `curl -s -o /home/claude/chart_exec.png "<image URL>"` and confirm with the `file` command that it is a PNG/JPEG
+3. Open the image with the view tool and perform the evaluation
+4. Images in the "## Higher TF" section can be retrieved the same way, but the subject of evaluation is always the execution-timeframe line. Use higher-timeframe images only for contextual reference mentions
+5. If the user's own notes on the page (description of their entry decision) can be read, still perform the evaluation itself independently from the image; after evaluating, you may comment on agreement/disagreement with the user's self-analysis
 
-失敗時のフォールバック:
-- ダウンロードが「Host not in allowlist」等で失敗した場合、ネットワーク許可リストに `prod-files-secure.s3.us-west-2.amazonaws.com` が含まれていない。ユーザーに設定追加(反映は新しい会話から)を案内し、当面はチャットへの画像アップロードを依頼する
-- 署名付きURLは1時間で失効するため、ダウンロードに失敗したらページを再fetchして新しいURLを取得してから再試行する
+Fallback on failure:
+- If the download fails with "Host not in allowlist" or similar, `prod-files-secure.s3.us-west-2.amazonaws.com` is not in the network allowlist. Guide the user to add it to the settings (takes effect from a new conversation), and in the meantime ask them to upload the image to the chat
+- Signed URLs expire after 1 hour, so if the download fails, re-fetch the page to get a new URL and then retry
 
-## 評価時の注意
+## Notes for evaluation
 
-- 画像から読み取れない情報(上位足の200EMAの傾き = STEP 0)は評価対象外であることを明記する。このスキルはSTEP 3のライン品質のみを評価する。
-- 結果論で採点しない。ブレイク後の値動きが画像に写っていても、評価は「ブレイク前の時点で引けたか・妥当だったか」に基づく。勝ちトレードでも引き方が悪ければ低評価、負けトレードでも引き方が正しければ高評価になりうる。
-- ラインが画像に引かれていない場合は、まず「妥当なラインが引けるか」を診断し、引けるなら自分で引いた想定で評価、引けないならその事実自体を軸1の低評価(無理引きしかできない=見送り)として報告する。
+- State explicitly that information that cannot be read from the image (the slope of the higher-timeframe 200EMA = STEP 0) is outside the scope of evaluation. This skill evaluates only the line quality of STEP 3.
+- Do not score in hindsight. Even if the price action after the break appears in the image, the evaluation is based on "could the line be drawn, and was it valid, before the break." A winning trade with a badly drawn line can be rated low, and a losing trade with a correctly drawn line can be rated high.
+- If no line is drawn on the image, first diagnose "can a valid line be drawn?" If it can, evaluate assuming you drew it yourself; if it cannot, report that fact itself as a low score on Axis 1 (only a forced line is possible = skip).

@@ -13,7 +13,7 @@ export function readStrategyDocs(strategy: StrategyDefinition) {
   }));
 }
 
-/** 手法ドキュメント全体のハッシュ。どの基準で判定されたかを Evaluation に記録する */
+/** Hash of the whole set of strategy docs. Recorded on each Evaluation to track which criteria it was judged against */
 export function strategyVersion(strategy: StrategyDefinition) {
   const h = createHash("sha256");
   h.update(JSON.stringify({ axes: strategy.axes, observations: strategy.observations, verdicts: strategy.verdicts }));
